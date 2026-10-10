@@ -1,8 +1,9 @@
+import { after, before, describe, it } from 'node:test';
+
 import type { Credentials } from '@rocket.chat/api-client';
 import type { IMessage, IOmnichannelRoom, IRoom, IThreadMessage, IUser } from '@rocket.chat/core-typings';
 import { Random } from '@rocket.chat/random';
 import { expect } from 'chai';
-import { after, before, describe, it } from 'mocha';
 
 import { retry } from './helpers/retry';
 import { api, credentials, getCredentials, methodCall, methodCallAnon, request } from '../../data/api-data';
@@ -17,7 +18,7 @@ import { createUser, deleteUser, login } from '../../data/users.helper';
 import { IS_EE } from '../../e2e/config/constants';
 
 describe('Meteor.methods', () => {
-	before((done) => getCredentials(done));
+	before((_t, done) => getCredentials(done));
 
 	describe('[@getThreadMessages]', () => {
 		let rid: IRoom['_id'];
@@ -25,7 +26,7 @@ describe('Meteor.methods', () => {
 
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -46,7 +47,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -65,7 +66,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message into thread', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -254,7 +255,7 @@ describe('Meteor.methods', () => {
 			});
 
 			describe('simple message and thread where the room message was read by the invited user but the thread message was not', () => {
-				before("should read all main room's messages with the invited user", async () => {
+				before(async () => {
 					await request.post(api('subscriptions.read')).set(userCredentials).send({ rid: room._id });
 				});
 
@@ -312,7 +313,7 @@ describe('Meteor.methods', () => {
 			});
 
 			describe('simple message and thread where both was read by the invited user', () => {
-				before('should read thread messages with the invited user', async () => {
+				before(async () => {
 					await request
 						.post(methodCall('getThreadMessages'))
 						.set(userCredentials)
@@ -371,12 +372,12 @@ describe('Meteor.methods', () => {
 				let otherMessage: IMessage;
 				let otherThreadMessage: IThreadMessage;
 
-				before('should send another message and create a thread', async () => {
+				before(async () => {
 					otherMessage = (await sendSimpleMessage({ roomId: room._id })).body.message;
 					otherThreadMessage = (await sendSimpleMessage({ roomId: room._id, tmid: otherMessage._id })).body.message;
 				});
 
-				before('should mark the thread as read by the invited user', async () => {
+				before(async () => {
 					await request
 						.post(methodCall('readThreads'))
 						.set(userCredentials)
@@ -472,7 +473,7 @@ describe('Meteor.methods', () => {
 
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -493,7 +494,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -512,7 +513,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send another sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -628,16 +629,16 @@ describe('Meteor.methods', () => {
 		let testUserCredentials: Credentials;
 		let channelName: string;
 
-		before('update permissions', async () => {
+		before(async () => {
 			await updatePermission('clean-channel-history', ['admin', 'user']);
 		});
 
-		before('create test user', async () => {
+		before(async () => {
 			testUser = await createUser();
 			testUserCredentials = await login(testUser.username, password);
 		});
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -658,7 +659,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -676,7 +677,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send another sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -791,7 +792,7 @@ describe('Meteor.methods', () => {
 
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -812,7 +813,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -831,7 +832,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send another sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -853,7 +854,7 @@ describe('Meteor.methods', () => {
 		let publicRid: IRoom['_id'];
 		let publicMessageId: IMessage['_id'];
 
-		before('create public channel with a message', async () => {
+		before(async () => {
 			publicRid = (await createRoom({ type: 'c', name: `methods-test-public-${Date.now()}` })).body.channel._id;
 			publicMessageId = (await sendMessage({ message: { rid: publicRid, msg: 'public message' } })).body.message._id;
 		});
@@ -1066,7 +1067,7 @@ describe('Meteor.methods', () => {
 
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -1087,7 +1088,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -1106,7 +1107,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send another sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -1247,7 +1248,7 @@ describe('Meteor.methods', () => {
 
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -1268,7 +1269,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('create test user', (done) => {
+		before((_t, done) => {
 			const username = `user.test.${Date.now()}`;
 			const email = `${username}@rocket.chat`;
 			void request
@@ -1281,7 +1282,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		before('add user to room', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('groups.invite'))
 				.set(credentials)
@@ -1482,7 +1483,7 @@ describe('Meteor.methods', () => {
 
 		const channelName = `methods-test-channel-${Date.now()}`;
 
-		before('create test group', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('groups.create'))
 				.set(credentials)
@@ -1502,7 +1503,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -1521,7 +1522,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send another sample message', (done) => {
+		before((_t, done) => {
 			void request
 				.post(api('chat.sendMessage'))
 				.set(credentials)
@@ -1744,7 +1745,7 @@ describe('Meteor.methods', () => {
 			expect(res.body).to.have.property('message');
 		});
 
-		it('should return nothing when user doesnt have any permission', (done) => {
+		it('should return nothing when user doesnt have any permission', (_t, done) => {
 			void updatePermission('view-privileged-setting', [])
 				.then(() => updatePermission('edit-privileged-setting', []))
 				.then(() => updatePermission('manage-selected-settings', []))
@@ -1800,7 +1801,7 @@ describe('Meteor.methods', () => {
 			expect(data.result.update.length).to.not.equal(0);
 		});
 
-		it('should return properties when user has all related permissions', (done) => {
+		it('should return properties when user has all related permissions', (_t, done) => {
 			void updatePermission('view-privileged-setting', ['admin'])
 				.then(() => updatePermission('edit-privileged-setting', ['admin']))
 				.then(() => updatePermission('manage-selected-settings', ['admin']))
@@ -1906,7 +1907,7 @@ describe('Meteor.methods', () => {
 		let rid: IRoom['_id'];
 		let channelName: string;
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -2084,7 +2085,7 @@ describe('Meteor.methods', () => {
 			testUserCredentials = await login(testUser.username, password);
 		});
 
-		before('create room', (done) => {
+		before((_t, done) => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			void request
 				.post(api('groups.create'))
@@ -2106,12 +2107,12 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send simple message', async () => {
+		before(async () => {
 			const res = await sendSimpleMessage({ roomId: rid });
 			simpleMessageId = res.body.message._id;
 		});
 
-		before('send message with URL', (done) => {
+		before((_t, done) => {
 			void request
 				.post(methodCall('sendMessage'))
 				.set(credentials)
@@ -2144,7 +2145,7 @@ describe('Meteor.methods', () => {
 				.end(done);
 		});
 
-		before('send message with URL inside markdown', (done) => {
+		before((_t, done) => {
 			void request
 				.post(methodCall('sendMessage'))
 				.set(credentials)
@@ -2430,7 +2431,7 @@ describe('Meteor.methods', () => {
 			]);
 		});
 
-		it('should not parse URLs inside markdown on update', (done) => {
+		it('should not parse URLs inside markdown on update', (_t, done) => {
 			void request
 				.post(methodCall('updateMessage'))
 				.set(credentials)
@@ -2546,7 +2547,7 @@ describe('Meteor.methods', () => {
 			).body.channel;
 		});
 
-		before('create direct conversation with user', (done) => {
+		before((_t, done) => {
 			void request
 				.post(methodCall('createDirectMessage'))
 				.set(credentials)
@@ -2612,7 +2613,7 @@ describe('Meteor.methods', () => {
 			await updateSetting('Accounts_AllowAnonymousRead', false);
 		});
 
-		it("should throw an error if the user isn't logged in", (done) => {
+		it("should throw an error if the user isn't logged in", (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.send({
@@ -2631,7 +2632,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it("should throw an error if name isn't provided", (done) => {
+		it("should throw an error if name isn't provided", (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(credentials)
@@ -2655,7 +2656,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it("should throw an error if type isn't provided", (done) => {
+		it("should throw an error if type isn't provided", (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(credentials)
@@ -2679,7 +2680,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it("should throw an error if the user doesn't have access to the room", (done) => {
+		it("should throw an error if the user doesn't have access to the room", (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(testUserCredentials)
@@ -2702,7 +2703,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it("should throw an error if the room doesn't exist", (done) => {
+		it("should throw an error if the room doesn't exist", (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(testUserCredentials)
@@ -2745,7 +2746,7 @@ describe('Meteor.methods', () => {
 			await updateSetting('Accounts_AllowAnonymousRead', false);
 		});
 
-		it('should return the room object for a DM', (done) => {
+		it('should return the room object for a DM', (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(credentials)
@@ -2927,7 +2928,7 @@ describe('Meteor.methods', () => {
 			testUserCredentials = await login(testUser.username, password);
 		});
 
-		before('create direct conversation with user', (done) => {
+		before((_t, done) => {
 			void request
 				.post(methodCall('createDirectMessage'))
 				.set(credentials)
@@ -2949,7 +2950,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		before('create direct conversation between both users', (done) => {
+		before((_t, done) => {
 			void request
 				.post(methodCall('createDirectMessage'))
 				.set(testUserCredentials)
@@ -2981,7 +2982,7 @@ describe('Meteor.methods', () => {
 			]),
 		);
 
-		it('should deactivate a user', (done) => {
+		it('should deactivate a user', (_t, done) => {
 			void request
 				.post(methodCall('setUserActiveStatus'))
 				.set(credentials)
@@ -3001,7 +3002,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should deactivate another user', (done) => {
+		it('should deactivate another user', (_t, done) => {
 			void request
 				.post(methodCall('setUserActiveStatus'))
 				.set(credentials)
@@ -3021,7 +3022,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should mark the direct conversation between admin=>testUser as readonly when user is deactivated', (done) => {
+		it('should mark the direct conversation between admin=>testUser as readonly when user is deactivated', (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(credentials)
@@ -3041,7 +3042,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should activate a user', (done) => {
+		it('should activate a user', (_t, done) => {
 			void request
 				.post(methodCall('setUserActiveStatus'))
 				.set(credentials)
@@ -3061,7 +3062,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should set readonly=false when user is activated (and the other side is also active)', (done) => {
+		it('should set readonly=false when user is activated (and the other side is also active)', (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(credentials)
@@ -3081,7 +3082,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should keep the direct conversation between testUser=>testUser2 as readonly when one of them is deactivated', (done) => {
+		it('should keep the direct conversation between testUser=>testUser2 as readonly when one of them is deactivated', (_t, done) => {
 			void request
 				.post(api('login'))
 				.send({
@@ -3151,7 +3152,7 @@ describe('Meteor.methods', () => {
 			expect(result.result.ro).to.equal(true);
 		});
 
-		it('should activate another user', (done) => {
+		it('should activate another user', (_t, done) => {
 			void request
 				.post(methodCall('setUserActiveStatus'))
 				.set(credentials)
@@ -3171,7 +3172,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should set readonly=false when both users are activated', (done) => {
+		it('should set readonly=false when both users are activated', (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(testUserCredentials)
@@ -3191,7 +3192,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		it('should keep readonly=true when user is activated (and the other side is deactivated)', (done) => {
+		it('should keep readonly=true when user is activated (and the other side is deactivated)', (_t, done) => {
 			void request
 				.post(methodCall('getRoomByTypeAndName'))
 				.set(testUserCredentials)
@@ -3284,7 +3285,7 @@ describe('Meteor.methods', () => {
 				expect(res.body).to.have.property('message');
 			});
 
-			it('should add a single user to a room', (done) => {
+			it('should add a single user to a room', (_t, done) => {
 				void request
 					.post(methodCall('addUsersToRoom'))
 					.set(credentials)
@@ -3320,12 +3321,9 @@ describe('Meteor.methods', () => {
 					.catch(done);
 			});
 
-			it('should not add guest users to more rooms than defined in the license', async function () {
-				// TODO this is not the right way to do it. We're doing this way for now just because we have separate CI jobs for EE and CE,
-				// ideally we should have a single CI job that adds a license and runs both CE and EE tests.
-				if (!process.env.IS_EE) {
-					this.skip();
-				}
+			// TODO this is not the right way to do it. We're doing this way for now just because we have separate CI jobs for EE and CE,
+			// ideally we should have a single CI job that adds a license and runs both CE and EE tests.
+			it('should not add guest users to more rooms than defined in the license', { skip: !process.env.IS_EE }, async () => {
 				const promises = [];
 				for (let i = 0; i < maxRoomsPerGuest; i++) {
 					promises.push(
@@ -3431,12 +3429,12 @@ describe('Meteor.methods', () => {
 		const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).toISOString();
 		const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).toISOString();
 
-		before('create test user', async () => {
+		before(async () => {
 			testUser = await createUser();
 			testUserCredentials = await login(testUser.username, password);
 		});
 
-		before('generate audits data', async () => {
+		before(async () => {
 			await request.post(api('audit.messages')).set(credentials).send({
 				type: '',
 				msg: 'test1234',
@@ -3524,7 +3522,7 @@ describe('Meteor.methods', () => {
 		let middleMessage: IMessage;
 		let channelName: string;
 
-		before('create room', async () => {
+		before(async () => {
 			channelName = `methods-test-channel-${Date.now()}`;
 			await request
 				.post(api('groups.create'))
@@ -3541,7 +3539,7 @@ describe('Meteor.methods', () => {
 				});
 		});
 
-		before('send messages', async () => {
+		before(async () => {
 			await sendMessage({ message: { rid, msg: 'Message 1' } });
 			await sendMessage({ message: { rid, msg: 'Message 2' } });
 			const msg3 = await sendMessage({ message: { rid, msg: 'Message 3' } });
