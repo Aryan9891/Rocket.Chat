@@ -1,4 +1,5 @@
 import { Apps } from '@rocket.chat/apps';
+import { isMeteorError, MeteorError } from '@rocket.chat/core-services';
 import type { SlashCommand, SlashCommandPreviewItem } from '@rocket.chat/core-typings';
 import { Messages } from '@rocket.chat/models';
 import { Random } from '@rocket.chat/random';
@@ -366,6 +367,10 @@ const commandsPreviewPostResponseSchema = ajv.compile<void>({
 	additionalProperties: false,
 });
 
+const forbiddenErrors = ['error-not-authorized', 'error-not-allowed'];
+
+const isForbiddenError = (error: unknown): error is MeteorError => isMeteorError(error) && forbiddenErrors.includes(String(error.error));
+
 // Expects a body of: { command: 'gimme', params: 'any string value', roomId: 'value', triggerId: 'value' }
 API.v1.post(
 	'commands.run',
@@ -408,9 +413,17 @@ API.v1.post(
 
 		const { triggerId } = body;
 
-		const result = await slashCommands.run({ command: cmd, params, message, triggerId, userId: this.userId });
+		try {
+			const result = await slashCommands.run({ command: cmd, params, message, triggerId, userId: this.userId });
 
-		return API.v1.success({ result });
+			return API.v1.success({ result });
+		} catch (error) {
+			if (isForbiddenError(error)) {
+				throw new MeteorError('error-forbidden', error.reason, error.details);
+			}
+
+			throw error;
+		}
 	},
 );
 
@@ -441,14 +454,22 @@ API.v1.get(
 
 		const params = query.params ? query.params : '';
 
-		const preview = await getSlashCommandPreviews({
-			cmd,
-			params,
-			msg: { rid: query.roomId },
-			userId: this.userId,
-		});
+		try {
+			const preview = await getSlashCommandPreviews({
+				cmd,
+				params,
+				msg: { rid: query.roomId },
+				userId: this.userId,
+			});
 
-		return API.v1.success({ preview: preview ?? null });
+			return API.v1.success({ preview: preview ?? null });
+		} catch (error) {
+			if (isForbiddenError(error)) {
+				throw new MeteorError('error-forbidden', error.reason, error.details);
+			}
+
+			throw error;
+		}
 	},
 );
 
@@ -490,18 +511,26 @@ API.v1.post(
 			...(body.tmid && { tmid: body.tmid }),
 		};
 
-		await executeSlashCommandPreview(
-			{
-				cmd,
-				params,
-				msg,
-				triggerId: body.triggerId,
-			},
-			body.previewItem,
-			this.userId,
-		);
+		try {
+			await executeSlashCommandPreview(
+				{
+					cmd,
+					params,
+					msg,
+					triggerId: body.triggerId,
+				},
+				body.previewItem,
+				this.userId,
+			);
 
-		return API.v1.success();
+			return API.v1.success();
+		} catch (error) {
+			if (isForbiddenError(error)) {
+				throw new MeteorError('error-forbidden', error.reason, error.details);
+			}
+
+			throw error;
+		}
 	},
 );
 
