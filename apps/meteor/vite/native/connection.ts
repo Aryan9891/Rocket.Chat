@@ -1,6 +1,7 @@
 // Vite-build implementation of client/meteor/connection.ts: DDPSDK is the only transport.
 import { Random } from '@rocket.chat/random';
 
+import { process2faAsyncReturn } from '../../client/lib/2fa/process2faReturn';
 import { APIClient } from '../../client/lib/RestApiClient';
 import { parseDDP, stringifyDDP } from '../../client/lib/sdk/ddpProtocol';
 import { getDdpSdk } from '../../client/lib/sdk/ddpSdk';
@@ -73,10 +74,21 @@ const callOverREST = async (method: string, params: unknown[]): Promise<any> => 
 
 let pendingMethods = 0;
 
+const callMethodOnce = (method: string, args: unknown[]): Promise<any> =>
+	isSocketMethod(method, args) ? getDdpSdk().client.callAsync(method, ...args) : callOverREST(method, args);
+
 export const callMethod = async (method: string, ...args: unknown[]): Promise<any> => {
 	pendingMethods++;
 	try {
-		return await (isSocketMethod(method, args) ? getDdpSdk().client.callAsync(method, ...args) : callOverREST(method, args));
+		return await callMethodOnce(method, args);
+	} catch (error) {
+		// Same second-factor retry as client/meteor/overrides/totpOnCall; login answers its own challenge (lib/2fa/overrideLoginMethod).
+		if (method === 'login') throw error;
+		return await process2faAsyncReturn({
+			error,
+			onCode: (twoFactorCode, twoFactorMethod) => callMethodOnce(method, [...args, { twoFactorCode, twoFactorMethod }]),
+			emailOrUsername: undefined,
+		});
 	} finally {
 		pendingMethods--;
 	}
