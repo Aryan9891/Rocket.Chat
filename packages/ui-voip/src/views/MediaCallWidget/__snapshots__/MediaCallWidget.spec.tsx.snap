@@ -1396,21 +1396,6 @@ exports[`renders OngoingCallDisabledAllButScreenshare without crashing 1`] = `
               
             </i>
           </button>
-          <button
-            aria-label="Device_settings_lowercase"
-            class="rcx-box rcx-box--full rcx-button--tiny-square rcx-button--square rcx-button--icon rcx-button rcx-css-1wk08i8"
-            disabled=""
-            label="Device_settings_lowercase"
-            title="Device_settings_not_supported_by_browser"
-            type="button"
-          >
-            <i
-              aria-hidden="true"
-              class="rcx-box rcx-box--full rcx-icon--name-customize rcx-icon rcx-css-xb06ut"
-            >
-              
-            </i>
-          </button>
         </div>
       </header>
       <section
@@ -1480,20 +1465,6 @@ exports[`renders OngoingCallDisabledAllButScreenshare without crashing 1`] = `
           class="rcx-button-group rcx-button-group--align-center rcx-button-group--large"
           role="group"
         >
-          <button
-            aria-label="Mute"
-            class="rcx-box rcx-box--full rcx-button--medium-square rcx-button--icon-secondary rcx-button--square rcx-button--icon rcx-button"
-            label="Mute"
-            title="Mute"
-            type="button"
-          >
-            <i
-              aria-hidden="true"
-              class="rcx-box rcx-box--full rcx-icon--name-mic rcx-icon rcx-css-xb06ut"
-            >
-              
-            </i>
-          </button>
           <button
             aria-label="Share_screen"
             class="rcx-box rcx-box--full rcx-button--medium-square rcx-button--icon-secondary rcx-button--square rcx-button--icon rcx-button"
@@ -1582,23 +1553,7 @@ exports[`renders OngoingCallDisabledAllFeatures without crashing 1`] = `
         </h3>
         <div
           class="rcx-box rcx-box--full rcx-css-qwfmt5"
-        >
-          <button
-            aria-label="Device_settings_lowercase"
-            class="rcx-box rcx-box--full rcx-button--tiny-square rcx-button--square rcx-button--icon rcx-button rcx-css-1wk08i8"
-            disabled=""
-            label="Device_settings_lowercase"
-            title="Device_settings_not_supported_by_browser"
-            type="button"
-          >
-            <i
-              aria-hidden="true"
-              class="rcx-box rcx-box--full rcx-icon--name-customize rcx-icon rcx-css-xb06ut"
-            >
-              
-            </i>
-          </button>
-        </div>
+        />
       </header>
       <section
         class="rcx-box rcx-box--full rcx-css-8j42zp"
@@ -1663,34 +1618,6 @@ exports[`renders OngoingCallDisabledAllFeatures without crashing 1`] = `
           class="rcx-button-group rcx-button-group--align-start rcx-button-group--large"
           role="group"
         >
-          <button
-            aria-label="Dialpad"
-            class="rcx-box rcx-box--full rcx-button--medium-square rcx-button--icon-secondary rcx-button--square rcx-button--icon rcx-button"
-            label="Dialpad"
-            title="Open_dialpad"
-            type="button"
-          >
-            <i
-              aria-hidden="true"
-              class="rcx-box rcx-box--full rcx-icon--name-dialpad rcx-icon rcx-css-xb06ut"
-            >
-              
-            </i>
-          </button>
-          <button
-            aria-label="Mute"
-            class="rcx-box rcx-box--full rcx-button--medium-square rcx-button--icon-secondary rcx-button--square rcx-button--icon rcx-button"
-            label="Mute"
-            title="Mute"
-            type="button"
-          >
-            <i
-              aria-hidden="true"
-              class="rcx-box rcx-box--full rcx-icon--name-mic rcx-icon rcx-css-xb06ut"
-            >
-              
-            </i>
-          </button>
           <button
             aria-label="Voice_call__user__hangup"
             class="rcx-box rcx-box--full rcx-button--medium-square rcx-button--icon-secondary-danger rcx-button--square rcx-button--icon rcx-button"
