@@ -90,7 +90,7 @@ exports[`renders Default without crashing 1`] = `
               role="group"
             >
               <button
-                class="rcx-box rcx-box--full rcx-button--small rcx-button"
+                class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button"
                 type="button"
               >
                 <span
@@ -234,7 +234,7 @@ exports[`renders InvalidLicense without crashing 1`] = `
               role="group"
             >
               <button
-                class="rcx-box rcx-box--full rcx-button--small rcx-button"
+                class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button"
                 type="button"
               >
                 <span
@@ -380,7 +380,7 @@ exports[`renders WithCurrentLicense without crashing 1`] = `
               role="group"
             >
               <button
-                class="rcx-box rcx-box--full rcx-button--small rcx-button"
+                class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button"
                 type="button"
               >
                 <span
@@ -396,7 +396,7 @@ exports[`renders WithCurrentLicense without crashing 1`] = `
                 </span>
               </button>
               <button
-                class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary-danger rcx-button"
+                class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary-danger rcx-button"
                 type="button"
               >
                 <span

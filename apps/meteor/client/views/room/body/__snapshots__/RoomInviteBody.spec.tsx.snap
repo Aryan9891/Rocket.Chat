@@ -142,7 +142,7 @@ exports[`RoomInvite renders Loading without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--loading rcx-button--secondary-danger rcx-button"
+            class="rcx-box rcx-box--full rcx-button--loading rcx-button--with-icon rcx-button--secondary-danger rcx-button"
             disabled=""
             type="button"
           >
@@ -151,7 +151,7 @@ exports[`RoomInvite renders Loading without crashing 1`] = `
             >
               <i
                 aria-hidden="true"
-                class="rcx-box rcx-box--full rcx-icon--name-loading rcx-icon rcx-css-1hdf9ok"
+                class="rcx-box rcx-box--full rcx-icon--name-loading rcx-icon rcx-css-1c32rho"
               >
                 
               </i>
@@ -159,7 +159,7 @@ exports[`RoomInvite renders Loading without crashing 1`] = `
             </span>
           </button>
           <button
-            class="rcx-box rcx-box--full rcx-button--loading rcx-button"
+            class="rcx-box rcx-box--full rcx-button--loading rcx-button--with-icon rcx-button"
             disabled=""
             type="button"
           >
@@ -168,7 +168,7 @@ exports[`RoomInvite renders Loading without crashing 1`] = `
             >
               <i
                 aria-hidden="true"
-                class="rcx-box rcx-box--full rcx-icon--name-loading rcx-icon rcx-css-1hdf9ok"
+                class="rcx-box rcx-box--full rcx-icon--name-loading rcx-icon rcx-css-1c32rho"
               >
                 
               </i>

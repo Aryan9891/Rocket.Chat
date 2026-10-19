@@ -79,7 +79,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -104,7 +104,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -129,7 +129,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -154,7 +154,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -179,7 +179,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -204,7 +204,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -229,7 +229,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
@@ -254,7 +254,7 @@ exports[`renders Default without crashing 1`] = `
                         wrap="no-wrap"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button--small rcx-button--secondary rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--small rcx-button--secondary rcx-button"
                           type="button"
                         >
                           <span
