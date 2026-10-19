@@ -1,3 +1,4 @@
+import { isClientSafeError } from '@rocket.chat/core-services';
 import { CredentialTokens } from '@rocket.chat/models';
 import { Accounts } from 'meteor/accounts-base';
 import { Meteor } from 'meteor/meteor';
@@ -57,7 +58,7 @@ Accounts.registerLoginHandler('saml', async (loginRequest) => {
 		let message = err.toString();
 		let errorCode = '';
 
-		if (err instanceof Meteor.Error) {
+		if (isClientSafeError(err)) {
 			errorCode = (err.error || err.message) as string;
 		} else if (err instanceof Error) {
 			errorCode = err.message;

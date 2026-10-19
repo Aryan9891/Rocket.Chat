@@ -6,8 +6,9 @@ import { OAuth } from 'meteor/oauth';
 import { checkCodeForUser } from './code';
 import { callbacks } from '../callbacks';
 
-const isMeteorError = (error: any): error is Meteor.Error => {
-	return error?.meteorError !== undefined;
+// OAuth sets `meteorError` only for real Meteor.Error instances when storing them
+const isStoredMeteorError = (error: any): error is Meteor.Error => {
+	return error?.meteorError !== undefined || error?.errorType === 'Meteor.Error';
 };
 
 const isCredentialWithError = (credential: any): credential is { error: Error } => {
@@ -62,7 +63,7 @@ const copyTo = <T extends Error>(from: T, to: T): T => {
 };
 
 const recreateError = (errorDoc: Error | Meteor.Error): Error | Meteor.Error => {
-	if (isMeteorError(errorDoc)) {
+	if (isStoredMeteorError(errorDoc)) {
 		const error = new Meteor.Error('');
 		return copyTo(errorDoc, error);
 	}

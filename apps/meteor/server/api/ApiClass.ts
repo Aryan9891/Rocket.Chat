@@ -1,3 +1,4 @@
+import { isClientSafeError } from '@rocket.chat/core-services';
 import type { IMethodConnection, IUser } from '@rocket.chat/core-typings';
 import type { Router } from '@rocket.chat/http-router';
 import { License } from '@rocket.chat/license';
@@ -1022,7 +1023,7 @@ export class APIClass<TBasePath extends string = '', TOperations extends Record<
 							},
 						});
 					} catch (error) {
-						if (!(error instanceof Meteor.Error)) {
+						if (!isClientSafeError(error)) {
 							return self.internalError();
 						}
 
