@@ -1667,7 +1667,6 @@ export class UsersRaw extends BaseRaw<IUser, DefaultFields<IUser>> implements IU
 					username: jid,
 					...(name && { name }),
 					type: 'user' as const,
-					status: UserStatus.OFFLINE,
 					active: true,
 					roles: ['federated-external'],
 					requirePasswordChange: false,
@@ -1677,6 +1676,7 @@ export class UsersRaw extends BaseRaw<IUser, DefaultFields<IUser>> implements IU
 				},
 				$setOnInsert: {
 					...(!name && { name: jid }),
+					status: UserStatus.OFFLINE,
 					createdAt: new Date(),
 				},
 			},
