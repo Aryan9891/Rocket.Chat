@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IOAuthApps } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { OAuthApps, Users } from '@rocket.chat/models';
@@ -23,21 +24,21 @@ export const updateOAuthApp = async (
 	application: Pick<IOAuthApps, 'name' | 'redirectUri' | 'active'>,
 ): Promise<IOAuthApps | null> => {
 	if (!(await hasPermissionAsync(userId, 'manage-oauth-apps'))) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'updateOAuthApp' });
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'updateOAuthApp' });
 	}
 
 	if (!application.name || typeof application.name.valueOf() !== 'string' || application.name.trim() === '') {
-		throw new Meteor.Error('error-invalid-name', 'Invalid name', { method: 'updateOAuthApp' });
+		throw new ClientSafeError('error-invalid-name', 'Invalid name', { method: 'updateOAuthApp' });
 	}
 
 	if (!application.redirectUri || typeof application.redirectUri.valueOf() !== 'string' || application.redirectUri.trim() === '') {
-		throw new Meteor.Error('error-invalid-redirectUri', 'Invalid redirectUri', {
+		throw new ClientSafeError('error-invalid-redirectUri', 'Invalid redirectUri', {
 			method: 'updateOAuthApp',
 		});
 	}
 
 	if (typeof application.active !== 'boolean') {
-		throw new Meteor.Error('error-invalid-arguments', 'Invalid arguments', {
+		throw new ClientSafeError('error-invalid-arguments', 'Invalid arguments', {
 			method: 'updateOAuthApp',
 		});
 	}
@@ -45,7 +46,7 @@ export const updateOAuthApp = async (
 	const redirectUri = parseUriList(application.redirectUri);
 
 	if (redirectUri.length === 0) {
-		throw new Meteor.Error('error-invalid-redirectUri', 'Invalid redirectUri', {
+		throw new ClientSafeError('error-invalid-redirectUri', 'Invalid redirectUri', {
 			method: 'updateOAuthApp',
 		});
 	}
@@ -62,7 +63,7 @@ export const updateOAuthApp = async (
 	});
 
 	if (updatedApplication == null) {
-		throw new Meteor.Error('error-application-not-found', 'Application not found', {
+		throw new ClientSafeError('error-application-not-found', 'Application not found', {
 			method: 'updateOAuthApp',
 		});
 	}
@@ -74,7 +75,7 @@ Meteor.methods<ServerMethods>({
 	async updateOAuthApp(applicationId, application) {
 		methodDeprecationLogger.method('updateOAuthApp', '9.0.0', '/v1/oauth-apps.update');
 		if (!this.userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'updateOAuthApp' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'updateOAuthApp' });
 		}
 
 		return updateOAuthApp(this.userId, applicationId, application);

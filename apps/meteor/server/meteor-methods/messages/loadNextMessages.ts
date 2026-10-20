@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages } from '@rocket.chat/models';
@@ -22,19 +23,19 @@ Meteor.methods<ServerMethods>({
 		check(limit, Number);
 
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'loadNextMessages',
 			});
 		}
 
 		if (!rid) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'loadNextMessages' });
+			throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'loadNextMessages' });
 		}
 
 		const fromId = Meteor.userId();
 
 		if (!fromId || !(await canAccessRoomIdAsync(rid, fromId))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'loadNextMessages' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'loadNextMessages' });
 		}
 
 		let records;

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages } from '@rocket.chat/models';
@@ -22,7 +23,7 @@ Meteor.methods<ServerMethods>({
 		const user = await Meteor.userAsync();
 
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getMessages' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'getMessages' });
 		}
 
 		const msgs = await Messages.findVisibleByIds(messages).toArray();
@@ -37,7 +38,7 @@ Meteor.methods<ServerMethods>({
 				user,
 			))
 		) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getMessages' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'getMessages' });
 		}
 
 		return msgs;

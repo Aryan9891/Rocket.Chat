@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IWebdavAccount, IWebdavNode } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { WebdavAccounts } from '@rocket.chat/models';
@@ -19,18 +20,18 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid User', { method: 'getWebdavFileList' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid User', { method: 'getWebdavFileList' });
 		}
 
 		if (!settings.get('Webdav_Integration_Enabled')) {
-			throw new Meteor.Error('error-not-allowed', 'WebDAV Integration Not Allowed', {
+			throw new ClientSafeError('error-not-allowed', 'WebDAV Integration Not Allowed', {
 				method: 'getWebdavFileList',
 			});
 		}
 
 		const account = await WebdavAccounts.findOneByIdAndUserId(accountId, userId, {});
 		if (!account) {
-			throw new Meteor.Error('error-invalid-account', 'Invalid WebDAV Account', {
+			throw new ClientSafeError('error-invalid-account', 'Invalid WebDAV Account', {
 				method: 'getWebdavFileList',
 			});
 		}
@@ -41,7 +42,7 @@ Meteor.methods<ServerMethods>({
 			const data = (await client.getDirectoryContents(path)) as IWebdavNode[];
 			return { success: true, data };
 		} catch (error) {
-			throw new Meteor.Error('could-not-access-webdav', 'Could not access webdav', {
+			throw new ClientSafeError('could-not-access-webdav', 'Could not access webdav', {
 				method: 'getWebdavFileList',
 			});
 		}

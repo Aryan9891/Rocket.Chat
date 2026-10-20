@@ -1,3 +1,4 @@
+import type { ClientSafeError } from '@rocket.chat/core-services';
 import { expect } from 'chai';
 import { before, after, beforeEach, describe, it } from 'mocha';
 import proxyquire from 'proxyquire';
@@ -7,18 +8,6 @@ const settingsGet = sinon.stub();
 const totpEnabled = sinon.stub().returns(false);
 const emailEnabled = sinon.stub().returns(false);
 const createTwoFactorChallenge = sinon.stub();
-
-class MeteorError extends Error {
-	error: string;
-
-	details?: unknown;
-
-	constructor(error: string, reason?: string, details?: unknown) {
-		super(reason ?? error);
-		this.error = error;
-		this.details = details;
-	}
-}
 
 // Disabled second-factor methods so the password fallback is the only candidate.
 class TOTPCheck {
@@ -77,9 +66,6 @@ const { checkCodeForUser, getFingerprintFromConnection } = proxyquire.noCallThru
 		Accounts: {
 			_getLoginToken: () => 'token-hash',
 		},
-	},
-	'meteor/meteor': {
-		Meteor: { Error: MeteorError },
 	},
 	'./TOTPCheck': { TOTPCheck },
 	'./EmailCheck': { EmailCheck },
@@ -227,7 +213,7 @@ describe('checkCodeForUser - resend challenge for emailed codes', () => {
 	});
 
 	it('should give a password login a resend-only challenge', async () => {
-		const error = await checkCodeForUser({ user, options: { issueResendChallenge: true } }).catch((e: MeteorError) => e);
+		const error = await checkCodeForUser({ user, options: { issueResendChallenge: true } }).catch((e: ClientSafeError) => e);
 
 		expect(error).to.have.nested.property('details.challengeId', 'challenge-id');
 		expect(createTwoFactorChallenge.calledOnceWithExactly('user-id', 'email', 'resend')).to.be.equal(true);
@@ -236,7 +222,7 @@ describe('checkCodeForUser - resend challenge for emailed codes', () => {
 	it('should not issue a challenge when the login asks for a TOTP code', async () => {
 		totpEnabled.returns(true);
 
-		const error = await checkCodeForUser({ user, options: { issueResendChallenge: true } }).catch((e: MeteorError) => e);
+		const error = await checkCodeForUser({ user, options: { issueResendChallenge: true } }).catch((e: ClientSafeError) => e);
 
 		expect(error).to.have.nested.property('details.method', 'totp');
 		expect(error).to.not.have.nested.property('details.challengeId');
@@ -244,7 +230,7 @@ describe('checkCodeForUser - resend challenge for emailed codes', () => {
 	});
 
 	it('should not issue a challenge when the caller is not a login', async () => {
-		const error = await checkCodeForUser({ user, options: {} }).catch((e: MeteorError) => e);
+		const error = await checkCodeForUser({ user, options: {} }).catch((e: ClientSafeError) => e);
 
 		expect(error).to.have.property('error', 'totp-required');
 		expect(error).to.not.have.nested.property('details.challengeId');

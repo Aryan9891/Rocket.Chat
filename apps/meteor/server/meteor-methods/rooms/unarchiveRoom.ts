@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { isRegisterUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users, Rooms } from '@rocket.chat/models';
@@ -20,17 +21,17 @@ export const executeUnarchiveRoom = async (userId: string, rid: string) => {
 
 	const user = await Users.findOneById(userId, { projection: { username: 1, name: 1 } });
 	if (!user || !isRegisterUser(user)) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'archiveRoom' });
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'archiveRoom' });
 	}
 
 	const room = await Rooms.findOneById(rid);
 
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'unarchiveRoom' });
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'unarchiveRoom' });
 	}
 
 	if (!(await hasPermissionAsync(userId, 'unarchive-room', room._id))) {
-		throw new Meteor.Error('error-not-authorized', 'Not authorized', { method: 'unarchiveRoom' });
+		throw new ClientSafeError('error-not-authorized', 'Not authorized', { method: 'unarchiveRoom' });
 	}
 
 	return unarchiveRoom(rid, user);
@@ -42,7 +43,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'unarchiveRoom' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'unarchiveRoom' });
 		}
 
 		return executeUnarchiveRoom(userId, rid);

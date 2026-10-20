@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import { cronJobs } from '@rocket.chat/cron';
 import { Users } from '@rocket.chat/models';
@@ -385,7 +386,7 @@ Accounts.registerLoginHandler('crowd', async function (this: typeof Accounts, lo
 
 		if (!user) {
 			logger.debug({ msg: 'User is not allowed to access Rocket.Chat', username: loginRequest.username });
-			return new Meteor.Error('not-authorized', 'User is not authorized by crowd');
+			return new ClientSafeError('not-authorized', 'User is not authorized by crowd');
 		}
 
 		const result = await crowd.updateUserCollection(user);
@@ -394,7 +395,7 @@ Accounts.registerLoginHandler('crowd', async function (this: typeof Accounts, lo
 	} catch (err: any) {
 		logger.error({ msg: 'Crowd user not authenticated due to an error', err });
 
-		throw new Meteor.Error('user-not-found', err.message);
+		throw new ClientSafeError('user-not-found', err.message);
 	}
 });
 

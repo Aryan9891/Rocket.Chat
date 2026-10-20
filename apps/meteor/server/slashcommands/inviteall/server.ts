@@ -3,11 +3,10 @@
  * @param {Object} message - The message object
  */
 
-import { api } from '@rocket.chat/core-services';
+import { api, ClientSafeError } from '@rocket.chat/core-services';
 import type { ISubscription, SlashCommand, SlashCommandCallbackParams } from '@rocket.chat/core-typings';
 import { Rooms, Subscriptions, Users } from '@rocket.chat/models';
 import { isTruthy } from '@rocket.chat/tools';
-import { Meteor } from 'meteor/meteor';
 
 import { canAccessRoomAsync } from '../../lib/authorization';
 import { i18n } from '../../lib/i18n';
@@ -70,7 +69,7 @@ function inviteAll<T extends string>(type: T): SlashCommand<T>['callback'] {
 				return;
 			}
 			if ((await Subscriptions.countByRoomIdWhenUsernameExists(baseChannel._id)) > APIsettings) {
-				throw new Meteor.Error('error-user-limit-exceeded', 'User Limit Exceeded', {
+				throw new ClientSafeError('error-user-limit-exceeded', 'User Limit Exceeded', {
 					method: 'addAllToRoom',
 				});
 			}

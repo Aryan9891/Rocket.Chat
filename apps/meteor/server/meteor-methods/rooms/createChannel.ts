@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ICreatedRoom, ITeam } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users, Team } from '@rocket.chat/models';
@@ -33,24 +34,24 @@ export const createChannelMethod = async (
 	check(name, String);
 	check(members, Match.Optional([String]));
 	if (!userId) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createChannel' });
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'createChannel' });
 	}
 
 	const user = await Users.findOneById(userId, { projection: { services: 0 } });
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createChannel' });
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'createChannel' });
 	}
 
 	if (extraData.teamId) {
 		const team = await Team.findOneById<Pick<ITeam, '_id' | 'roomId'>>(extraData.teamId, { projection: { roomId: 1 } });
 		if (!team) {
-			throw new Meteor.Error('error-team-not-found', 'The "teamId" param provided does not match any team', { method: 'createChannel' });
+			throw new ClientSafeError('error-team-not-found', 'The "teamId" param provided does not match any team', { method: 'createChannel' });
 		}
 		if (!(await hasPermissionAsync(userId, 'create-team-channel', team.roomId))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'createChannel' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'createChannel' });
 		}
 	} else if (!(await hasPermissionAsync(userId, 'create-c'))) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'createChannel' });
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'createChannel' });
 	}
 
 	return createRoom('c', name, user, members, excludeSelf, readOnly, {
@@ -65,7 +66,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createChannel' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'createChannel' });
 		}
 
 		return createChannelMethod(uid, name, members, readOnly, customFields, extraData);

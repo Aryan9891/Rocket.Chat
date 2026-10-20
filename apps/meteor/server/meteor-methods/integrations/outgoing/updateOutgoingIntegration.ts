@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IIntegration, INewOutgoingIntegration, IUpdateOutgoingIntegration } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Integrations, Users } from '@rocket.chat/models';
@@ -28,7 +29,7 @@ export const updateOutgoingIntegration = async (
 	const integration = await validateOutgoingIntegration(_integration, userId);
 
 	if (!integration.token || integration.token.trim() === '') {
-		throw new Meteor.Error('error-invalid-token', 'Invalid token', {
+		throw new ClientSafeError('error-invalid-token', 'Invalid token', {
 			method: 'updateOutgoingIntegration',
 		});
 	}
@@ -43,13 +44,13 @@ export const updateOutgoingIntegration = async (
 			'_createdBy._id': userId,
 		});
 	} else {
-		throw new Meteor.Error('not_authorized', 'Unauthorized', {
+		throw new ClientSafeError('not_authorized', 'Unauthorized', {
 			method: 'updateOutgoingIntegration',
 		});
 	}
 
 	if (!currentIntegration) {
-		throw new Meteor.Error('invalid_integration', '[methods] updateOutgoingIntegration -> integration not found');
+		throw new ClientSafeError('invalid_integration', '[methods] updateOutgoingIntegration -> integration not found');
 	}
 
 	const oldScriptEngine = currentIntegration.scriptEngine;
@@ -59,7 +60,7 @@ export const updateOutgoingIntegration = async (
 		(scriptEngine !== oldScriptEngine || integration.script?.trim() !== currentIntegration.script?.trim())
 	) {
 		wrapExceptions(() => validateScriptEngine(scriptEngine)).catch((e) => {
-			throw new Meteor.Error(e.message);
+			throw new ClientSafeError(e.message);
 		});
 	}
 
@@ -122,7 +123,7 @@ Meteor.methods<ServerMethods>({
 	async updateOutgoingIntegration(integrationId, _integration) {
 		methodDeprecationLogger.method('updateOutgoingIntegration', '9.0.0', '/v1/integrations.update');
 		if (!this.userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'updateOutgoingIntegration',
 			});
 		}

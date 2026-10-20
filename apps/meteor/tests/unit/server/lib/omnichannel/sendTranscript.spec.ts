@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { expect } from 'chai';
 import p from 'proxyquire';
 import sinon from 'sinon';
@@ -61,14 +62,10 @@ const { sendTranscript } = p.noCallThru().load('../../../../../server/lib/omnich
 	'@rocket.chat/core-services': {
 		Message: { saveSystemMessage: sinon.stub().resolves() },
 		Omnichannel: { isWithinMACLimit: sinon.stub().resolves(true) },
+		ClientSafeError,
 	},
 	'@rocket.chat/models': modelsMock,
 	'@rocket.chat/logger': { Logger: mockLogger },
-	'meteor/meteor': {
-		Meteor: {
-			Error: globalThis.Error,
-		},
-	},
 	'meteor/check': { check: checkMock },
 	'../callbacks': {
 		callbacks: {

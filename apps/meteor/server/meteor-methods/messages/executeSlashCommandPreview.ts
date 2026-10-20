@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, RequiredField, SlashCommandPreviewItem } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
@@ -30,20 +31,20 @@ export const executeSlashCommandPreview = async (
 	userId: string,
 ): Promise<void> => {
 	if (!command?.cmd || !slashCommands.commands[command.cmd]) {
-		throw new Meteor.Error('error-invalid-command', 'Invalid Command Provided', {
+		throw new ClientSafeError('error-invalid-command', 'Invalid Command Provided', {
 			method: 'executeSlashCommandPreview',
 		});
 	}
 
 	const theCmd = slashCommands.commands[command.cmd];
 	if (!theCmd.providesPreview) {
-		throw new Meteor.Error('error-invalid-command', 'Command Does Not Provide Previews', {
+		throw new ClientSafeError('error-invalid-command', 'Command Does Not Provide Previews', {
 			method: 'executeSlashCommandPreview',
 		});
 	}
 
 	if (!preview) {
-		throw new Meteor.Error('error-invalid-command-preview', 'Invalid Preview Provided', {
+		throw new ClientSafeError('error-invalid-command-preview', 'Invalid Preview Provided', {
 			method: 'executeSlashCommandPreview',
 		});
 	}
@@ -55,7 +56,7 @@ Meteor.methods<ServerMethods>({
 	executeSlashCommandPreview(command, preview) {
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'getSlashCommandPreview',
 			});
 		}

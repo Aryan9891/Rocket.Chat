@@ -1,4 +1,4 @@
-import { api } from '@rocket.chat/core-services';
+import { api, ClientSafeError } from '@rocket.chat/core-services';
 import type { IWebdavAccountPayload } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { WebdavAccounts } from '@rocket.chat/models';
@@ -18,11 +18,11 @@ declare module '@rocket.chat/ddp-client' {
 
 export const addWebdavAccountByToken = async (userId: string, data: IWebdavAccountPayload): Promise<boolean> => {
 	if (!userId) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
+		throw new ClientSafeError('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
 	}
 
 	if (!settings.get('Webdav_Integration_Enabled')) {
-		throw new Meteor.Error('error-not-allowed', 'WebDAV Integration Not Allowed', {
+		throw new ClientSafeError('error-not-allowed', 'WebDAV Integration Not Allowed', {
 			method: 'addWebdavAccount',
 		});
 	}
@@ -69,7 +69,7 @@ export const addWebdavAccountByToken = async (userId: string, data: IWebdavAccou
 			account: accountData,
 		});
 	} catch (error) {
-		throw new Meteor.Error('could-not-access-webdav', 'Could not access webdav', {
+		throw new ClientSafeError('could-not-access-webdav', 'Could not access webdav', {
 			method: 'addWebdavAccount',
 		});
 	}
@@ -82,11 +82,11 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
 		}
 
 		if (!settings.get('Webdav_Integration_Enabled')) {
-			throw new Meteor.Error('error-not-allowed', 'WebDAV Integration Not Allowed', {
+			throw new ClientSafeError('error-not-allowed', 'WebDAV Integration Not Allowed', {
 				method: 'addWebdavAccount',
 			});
 		}
@@ -107,7 +107,7 @@ Meteor.methods<ServerMethods>({
 		);
 
 		if (duplicateAccount !== null) {
-			throw new Meteor.Error('duplicated-account', 'Account not found', {
+			throw new ClientSafeError('duplicated-account', 'Account not found', {
 				method: 'addWebdavAccount',
 			});
 		}
@@ -134,7 +134,7 @@ Meteor.methods<ServerMethods>({
 				account: accountData,
 			});
 		} catch (error) {
-			throw new Meteor.Error('could-not-access-webdav', 'Could not access webdav', {
+			throw new ClientSafeError('could-not-access-webdav', 'Could not access webdav', {
 				method: 'addWebdavAccount',
 			});
 		}
@@ -145,7 +145,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid User', { method: 'addWebdavAccount' });
 		}
 
 		return addWebdavAccountByToken(userId, data);

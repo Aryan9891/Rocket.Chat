@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
 
@@ -16,7 +17,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('authorization:removeRoleFromPermission', '9.0.0', '/v1/permissions.removeRole');
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'authorization:removeRoleFromPermission' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'authorization:removeRoleFromPermission' });
 		}
 		await removeRoleFromPermissionMethod(uid, permissionId, role);
 	},

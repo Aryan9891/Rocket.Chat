@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ISetting } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
@@ -30,7 +31,7 @@ Meteor.methods<ServerMethods>({
 
 		const uid = Meteor.userId();
 		if (uid === null) {
-			throw new Meteor.Error('error-action-not-allowed', 'Editing settings is not allowed', {
+			throw new ClientSafeError('error-action-not-allowed', 'Editing settings is not allowed', {
 				method: 'saveSetting',
 			});
 		}
@@ -43,7 +44,7 @@ Meteor.methods<ServerMethods>({
 			});
 		} catch (error) {
 			if (error instanceof SettingValidationError) {
-				throw new Meteor.Error('error-setting-validation-failed', error.message);
+				throw new ClientSafeError('error-setting-validation-failed', error.message);
 			}
 			throw error;
 		}

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ICustomUserStatus } from '@rocket.chat/core-typings';
 import { CustomUserStatus } from '@rocket.chat/models';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@rocket.chat/rest-typings';
 import type { PaginatedRequest, PaginatedResult } from '@rocket.chat/rest-typings';
 import { escapeRegExp } from '@rocket.chat/tools';
-import { Meteor } from 'meteor/meteor';
 
 import { deleteCustomUserStatus } from '../../meteor-methods/users/deleteCustomUserStatus';
 import { insertOrUpdateUserStatus } from '../../meteor-methods/users/insertOrUpdateUserStatus';
@@ -152,7 +152,7 @@ API.v1.post(
 
 		const customUserStatus = await CustomUserStatus.findOneByName(userStatusData.name);
 		if (!customUserStatus) {
-			throw new Meteor.Error('error-creating-custom-user-status', 'Error creating custom user status');
+			throw new ClientSafeError('error-creating-custom-user-status', 'Error creating custom user status');
 		}
 
 		return API.v1.success({
@@ -250,7 +250,7 @@ API.v1.post(
 		const customUserStatus = await CustomUserStatus.findOneById(userStatusData._id);
 
 		if (!customUserStatus) {
-			throw new Meteor.Error('error-updating-custom-user-status', 'Error updating custom user status');
+			throw new ClientSafeError('error-updating-custom-user-status', 'Error updating custom user status');
 		}
 
 		return API.v1.success({

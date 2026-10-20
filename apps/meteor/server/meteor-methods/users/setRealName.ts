@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -20,15 +21,15 @@ Meteor.methods<ServerMethods>({
 		check(name, String);
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'setRealName' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'setRealName' });
 		}
 
 		if (!settings.get('Accounts_AllowRealNameChange')) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'setRealName' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'setRealName' });
 		}
 
 		if (!(await setRealName(userId, name))) {
-			throw new Meteor.Error('error-could-not-change-name', 'Could not change name', {
+			throw new ClientSafeError('error-could-not-change-name', 'Could not change name', {
 				method: 'setRealName',
 			});
 		}

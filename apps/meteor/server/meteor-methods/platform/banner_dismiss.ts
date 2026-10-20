@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
@@ -17,7 +18,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('banner/dismiss', '9.0.0', '/v1/banners.dismiss');
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'banner/dismiss' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'banner/dismiss' });
 		}
 
 		await Users.setBannerReadById(userId, id);

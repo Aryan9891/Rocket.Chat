@@ -1,10 +1,9 @@
 import { AppEvents, Apps } from '@rocket.chat/apps';
 import { AppsEngineException } from '@rocket.chat/apps-engine/definition/exceptions';
-import { FederationMatrix, Message, Room, Team } from '@rocket.chat/core-services';
+import { FederationMatrix, Message, Room, Team, ClientSafeError } from '@rocket.chat/core-services';
 import type { ICreateRoomParams, ISubscriptionExtraData } from '@rocket.chat/core-services';
 import { type ICreatedRoom, type IUser, type IRoom, type RoomType, isUserNativeFederated } from '@rocket.chat/core-typings';
 import { Rooms, Subscriptions, Users } from '@rocket.chat/models';
-import { Meteor } from 'meteor/meteor';
 
 import { createDirectRoom } from './createDirectRoom';
 import { calculateRoomRolePriorityFromRoles } from '../../../lib/roles/calculateRoomRolePriorityFromRoles';
@@ -165,7 +164,7 @@ export const createRoom = async <T extends RoomType>(
 
 	// Prevent adding federated users to rooms that are not marked as federated explicitly
 	if (hasFederatedMembers && extraData.federated !== true) {
-		throw new Meteor.Error('error-federated-users-in-non-federated-rooms', 'Cannot add federated users to non-federated rooms', {
+		throw new ClientSafeError('error-federated-users-in-non-federated-rooms', 'Cannot add federated users to non-federated rooms', {
 			method: 'createRoom',
 		});
 	}
@@ -183,7 +182,7 @@ export const createRoom = async <T extends RoomType>(
 	const shouldBeHandledByFederation = extraData.federated === true;
 
 	if (shouldBeHandledByFederation && owner && !isUserNativeFederated(owner) && !(await FederationMatrix.canUserAccessFederation(owner))) {
-		throw new Meteor.Error('error-not-authorized-federation', 'Not authorized to access federation', {
+		throw new ClientSafeError('error-not-authorized-federation', 'Not authorized to access federation', {
 			method: 'createRoom',
 		});
 	}
@@ -195,26 +194,26 @@ export const createRoom = async <T extends RoomType>(
 	const memberList = [...members];
 
 	if (!onlyUsernames(memberList)) {
-		throw new Meteor.Error(
+		throw new ClientSafeError(
 			'error-invalid-members',
 			'members should be an array of usernames if provided for rooms other than direct messages',
 		);
 	}
 
 	if (!isValidName(name)) {
-		throw new Meteor.Error('error-invalid-name', 'Invalid name', {
+		throw new ClientSafeError('error-invalid-name', 'Invalid name', {
 			function: 'RocketChat.createRoom',
 		});
 	}
 
 	if (!owner) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			function: 'RocketChat.createRoom',
 		});
 	}
 
 	if (!owner?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			function: 'RocketChat.createRoom',
 		});
 	}
@@ -264,14 +263,14 @@ export const createRoom = async <T extends RoomType>(
 
 	const prevent = await Apps.self?.triggerEvent(AppEvents.IPreRoomCreatePrevent, tmp).catch((error) => {
 		if (error.name === AppsEngineException.name) {
-			throw new Meteor.Error('error-app-prevented', error.message);
+			throw new ClientSafeError('error-app-prevented', error.message);
 		}
 
 		throw error;
 	});
 
 	if (prevent) {
-		throw new Meteor.Error('error-app-prevented', 'A Rocket.Chat App prevented the room creation.');
+		throw new ClientSafeError('error-app-prevented', 'A Rocket.Chat App prevented the room creation.');
 	}
 
 	const eventResult = await Apps.self?.triggerEvent(

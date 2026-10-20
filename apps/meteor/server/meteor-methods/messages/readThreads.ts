@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages, Rooms } from '@rocket.chat/models';
@@ -24,7 +25,7 @@ Meteor.methods<ServerMethods>({
 		check(tmid, String);
 
 		if (!Meteor.userId() || !settings.get('Threads_enabled')) {
-			throw new Meteor.Error('error-not-allowed', 'Threads Disabled', {
+			throw new ClientSafeError('error-not-allowed', 'Threads Disabled', {
 				method: 'getThreadMessages',
 			});
 		}
@@ -38,11 +39,11 @@ Meteor.methods<ServerMethods>({
 
 		const room = await Rooms.findOneById(thread.rid);
 		if (!room) {
-			throw new Meteor.Error('error-room-does-not-exist', 'This room does not exist', { method: 'getThreadMessages' });
+			throw new ClientSafeError('error-room-does-not-exist', 'This room does not exist', { method: 'getThreadMessages' });
 		}
 
 		if (!(await canAccessRoomAsync(room, user))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getThreadMessages' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'getThreadMessages' });
 		}
 
 		await callbacks.run('beforeReadMessages', thread.rid, user?._id);

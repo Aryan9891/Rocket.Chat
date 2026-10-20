@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms } from '@rocket.chat/models';
@@ -20,7 +21,7 @@ Meteor.methods<ServerMethods>({
 
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'readMessages',
 			});
 		}
@@ -28,10 +29,10 @@ Meteor.methods<ServerMethods>({
 		const user = ((await Meteor.userAsync()) as IUser | null) ?? undefined;
 		const room = await Rooms.findOneById(rid);
 		if (!room) {
-			throw new Meteor.Error('error-room-does-not-exist', 'This room does not exist', { method: 'readMessages' });
+			throw new ClientSafeError('error-room-does-not-exist', 'This room does not exist', { method: 'readMessages' });
 		}
 		if (!(await canAccessRoomAsync(room, user))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'readMessages' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'readMessages' });
 		}
 
 		await readMessages(room, userId, readThreads);

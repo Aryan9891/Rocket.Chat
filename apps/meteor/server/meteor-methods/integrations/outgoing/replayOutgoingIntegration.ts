@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
 
@@ -15,7 +16,7 @@ Meteor.methods<ServerMethods>({
 	async replayOutgoingIntegration({ integrationId, historyId }) {
 		methodDeprecationLogger.method('replayOutgoingIntegration', '9.0.0', '/v1/integrations.replayOutgoing');
 		if (!this.userId) {
-			throw new Meteor.Error('not_authorized', 'Unauthorized', { method: 'replayOutgoingIntegration' });
+			throw new ClientSafeError('not_authorized', 'Unauthorized', { method: 'replayOutgoingIntegration' });
 		}
 		await replayOutgoingIntegrationMethod(this.userId, { integrationId, historyId });
 		return true;

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { isHiddenFor } from '@rocket.chat/streamer';
 import { Meteor } from 'meteor/meteor';
@@ -18,7 +19,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('getUserStatusText', '9.0.0', '/v1/users.presence');
 		const currentUserId = Meteor.userId();
 		if (!currentUserId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getUserStatusText' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'getUserStatusText' });
 		}
 
 		const hidden = await getUsersHiddenFrom(currentUserId);

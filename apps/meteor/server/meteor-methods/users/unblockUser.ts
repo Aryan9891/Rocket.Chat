@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -21,7 +22,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'unblockUser' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'unblockUser' });
 		}
 
 		await unblockUserMethod(userId, { rid, blocked });

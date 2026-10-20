@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { Meteor } from 'meteor/meteor';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users } from '@rocket.chat/models';
@@ -16,7 +17,7 @@ declare module '@rocket.chat/ddp-client' {
 
 export const regeneratePersonalAccessTokenOfUser = async (tokenName: string, userId: string): Promise<string> => {
 	if (!(await hasPermissionAsync(userId, 'create-personal-access-tokens'))) {
-		throw new Meteor.Error('not-authorized', 'Not Authorized', {
+		throw new ClientSafeError('not-authorized', 'Not Authorized', {
 			method: 'personalAccessTokens:regenerateToken',
 		});
 	}
@@ -26,7 +27,7 @@ export const regeneratePersonalAccessTokenOfUser = async (tokenName: string, use
 		tokenName,
 	});
 	if (!tokenExist) {
-		throw new Meteor.Error('error-token-does-not-exists', 'Token does not exist', {
+		throw new ClientSafeError('error-token-does-not-exists', 'Token does not exist', {
 			method: 'personalAccessTokens:regenerateToken',
 		});
 	}
@@ -46,7 +47,7 @@ Meteor.methods<ServerMethods>({
 	'personalAccessTokens:regenerateToken': twoFactorRequired(async function ({ tokenName }: { tokenName: string }) {
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('not-authorized', 'Not Authorized', {
+			throw new ClientSafeError('not-authorized', 'Not Authorized', {
 				method: 'personalAccessTokens:regenerateToken',
 			});
 		}

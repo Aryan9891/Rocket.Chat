@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 import p from 'proxyquire';
@@ -26,16 +27,9 @@ const notifyOnRoomChangedByIdMock = sinon.stub();
 const notifyOnSubscriptionChangedMock = sinon.stub();
 const afterBanFromRoomCallbackMock = { run: sinon.stub() };
 
-const meteorErrorMock = class extends Error {
-	constructor(message: string) {
-		super(message);
-	}
-};
-
 const { performUserBan, banUserFromRoom } = p.noCallThru().load('../../../../../server/lib/rooms/banUserFromRoom.ts', {
 	'@rocket.chat/models': modelsMock,
-	'@rocket.chat/core-services': { Message: messageMock },
-	'meteor/meteor': { Meteor: { Error: meteorErrorMock } },
+	'@rocket.chat/core-services': { Message: messageMock, ClientSafeError },
 	'../callbacks/afterBanFromRoomCallback': { afterBanFromRoomCallback: afterBanFromRoomCallbackMock },
 	'../roles/removeUserFromRoles': { removeUserFromRolesAsync: removeUserFromRolesAsyncMock },
 	'../notifyListener': {

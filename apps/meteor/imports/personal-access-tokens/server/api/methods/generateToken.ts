@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { Meteor } from 'meteor/meteor';
 import { Random } from '@rocket.chat/random';
 import { Accounts } from 'meteor/accounts-base';
@@ -23,7 +24,7 @@ export const generatePersonalAccessTokenOfUser = async ({
 	bypassTwoFactor: boolean;
 }): Promise<string> => {
 	if (!(await hasPermissionAsync(userId, 'create-personal-access-tokens'))) {
-		throw new Meteor.Error('not-authorized', 'Not Authorized', {
+		throw new ClientSafeError('not-authorized', 'Not Authorized', {
 			method: 'personalAccessTokens:generateToken',
 		});
 	}
@@ -34,7 +35,7 @@ export const generatePersonalAccessTokenOfUser = async ({
 		tokenName,
 	});
 	if (tokenExist) {
-		throw new Meteor.Error('error-token-already-exists', 'A token with this name already exists', {
+		throw new ClientSafeError('error-token-already-exists', 'A token with this name already exists', {
 			method: 'personalAccessTokens:generateToken',
 		});
 	}
@@ -63,7 +64,7 @@ Meteor.methods<ServerMethods>({
 	}) {
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('not-authorized', 'Not Authorized', {
+			throw new ClientSafeError('not-authorized', 'Not Authorized', {
 				method: 'personalAccessTokens:generateToken',
 			});
 		}

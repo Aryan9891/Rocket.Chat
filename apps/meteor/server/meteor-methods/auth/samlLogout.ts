@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
@@ -11,7 +12,7 @@ import { SAMLUtils } from '../../lib/saml/lib/Utils';
  */
 function getSamlServiceProviderOptions(provider: string): IServiceProviderOptions {
 	if (!provider) {
-		throw new Meteor.Error('no-saml-provider', 'SAML internal error', {
+		throw new ClientSafeError('no-saml-provider', 'SAML internal error', {
 			method: 'getSamlServiceProviderOptions',
 		});
 	}
@@ -37,7 +38,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 		// Make sure the user is logged in before we initiate SAML Logout
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'samlLogout' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'samlLogout' });
 		}
 		const providerConfig = getSamlServiceProviderOptions(provider);
 

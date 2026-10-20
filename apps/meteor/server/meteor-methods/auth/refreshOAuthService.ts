@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
 
@@ -19,13 +20,13 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'refreshOAuthService',
 			});
 		}
 
 		if ((await hasPermissionAsync(userId, 'add-oauth-service')) !== true) {
-			throw new Meteor.Error('error-action-not-allowed', 'Refresh OAuth Services is not allowed', {
+			throw new ClientSafeError('error-action-not-allowed', 'Refresh OAuth Services is not allowed', {
 				method: 'refreshOAuthService',
 				action: 'Refreshing_OAuth_Services',
 			});

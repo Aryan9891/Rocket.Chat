@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IReadReceiptWithUser, IMessage } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { License } from '@rocket.chat/license';
@@ -18,19 +19,19 @@ declare module '@rocket.chat/ddp-client' {
 
 export const getReadReceiptsFunction = async function (messageId: IMessage['_id'], userId: string): Promise<IReadReceiptWithUser[]> {
 	if (!License.hasModule('message-read-receipt')) {
-		throw new Meteor.Error('error-action-not-allowed', 'This is an enterprise feature', { method: 'getReadReceipts' });
+		throw new ClientSafeError('error-action-not-allowed', 'This is an enterprise feature', { method: 'getReadReceipts' });
 	}
 	check(messageId, String);
 
 	const message = await Messages.findOneById(messageId, { projection: { _id: 1, rid: 1, receiptsArchived: 1 } });
 	if (!message) {
-		throw new Meteor.Error('error-invalid-message', 'Invalid message', {
+		throw new ClientSafeError('error-invalid-message', 'Invalid message', {
 			method: 'getReadReceipts',
 		});
 	}
 
 	if (!(await canAccessRoomIdAsync(message.rid, userId))) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'getReadReceipts' });
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'getReadReceipts' });
 	}
 
 	return ReadReceipt.getReceipts(message);
@@ -44,7 +45,7 @@ Meteor.methods<ServerMethods>({
 
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getReadReceipts' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'getReadReceipts' });
 		}
 
 		return getReadReceiptsFunction(messageId, uid);

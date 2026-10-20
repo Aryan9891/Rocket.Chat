@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IIntegration, INewIncomingIntegration, IUpdateIncomingIntegration } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Integrations, Subscriptions, Users, Rooms } from '@rocket.chat/models';
@@ -24,7 +25,7 @@ declare module '@rocket.chat/ddp-client' {
 
 function validateChannels(channelString: string | undefined): string[] {
 	if (!channelString || typeof channelString.valueOf() !== 'string' || channelString.trim() === '') {
-		throw new Meteor.Error('error-invalid-channel', 'Invalid channel', {
+		throw new ClientSafeError('error-invalid-channel', 'Invalid channel', {
 			method: 'updateIncomingIntegration',
 		});
 	}
@@ -33,7 +34,7 @@ function validateChannels(channelString: string | undefined): string[] {
 
 	for (const channel of channels) {
 		if (!validChannelChars.includes(channel[0])) {
-			throw new Meteor.Error('error-invalid-channel-start-with-chars', 'Invalid channel. Start with @ or #', {
+			throw new ClientSafeError('error-invalid-channel-start-with-chars', 'Invalid channel. Start with @ or #', {
 				method: 'updateIncomingIntegration',
 			});
 		}
@@ -59,13 +60,13 @@ export const updateIncomingIntegration = async (
 			'_createdBy._id': userId,
 		});
 	} else {
-		throw new Meteor.Error('not_authorized', 'Unauthorized', {
+		throw new ClientSafeError('not_authorized', 'Unauthorized', {
 			method: 'updateIncomingIntegration',
 		});
 	}
 
 	if (!currentIntegration) {
-		throw new Meteor.Error('error-invalid-integration', 'Invalid integration', {
+		throw new ClientSafeError('error-invalid-integration', 'Invalid integration', {
 			method: 'updateIncomingIntegration',
 		});
 	}
@@ -77,7 +78,7 @@ export const updateIncomingIntegration = async (
 		(scriptEngine !== oldScriptEngine || integration.script?.trim() !== currentIntegration.script?.trim())
 	) {
 		wrapExceptions(() => validateScriptEngine(scriptEngine)).catch((e) => {
-			throw new Meteor.Error(e.message);
+			throw new ClientSafeError(e.message);
 		});
 	}
 
@@ -127,7 +128,7 @@ export const updateIncomingIntegration = async (
 		}
 
 		if (!record) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+			throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 				method: 'updateIncomingIntegration',
 			});
 		}
@@ -136,7 +137,7 @@ export const updateIncomingIntegration = async (
 			!(await hasAllPermissionAsync(userId, ['manage-incoming-integrations', 'manage-own-incoming-integrations'])) &&
 			!(await Subscriptions.findOneByRoomIdAndUserId(record._id, userId, { projection: { _id: 1 } }))
 		) {
-			throw new Meteor.Error('error-invalid-channel', 'Invalid Channel', {
+			throw new ClientSafeError('error-invalid-channel', 'Invalid Channel', {
 				method: 'updateIncomingIntegration',
 			});
 		}
@@ -146,13 +147,13 @@ export const updateIncomingIntegration = async (
 	const user = await Users.findOneByUsername(username, { projection: { _id: 1, username: 1 } });
 
 	if (!user) {
-		throw new Meteor.Error('error-invalid-post-as-user', 'Invalid Post As User', {
+		throw new ClientSafeError('error-invalid-post-as-user', 'Invalid Post As User', {
 			method: 'updateIncomingIntegration',
 		});
 	}
 
 	if (!(await hasPermissionAsync(user._id, 'message-impersonate'))) {
-		throw new Meteor.Error(
+		throw new ClientSafeError(
 			'error-user-lacks-message-impersonate-permission',
 			"User selected for the incoming integration lacks the 'message-impersonate' permission.",
 			{
@@ -201,7 +202,7 @@ Meteor.methods<ServerMethods>({
 	async updateIncomingIntegration(integrationId, integration) {
 		methodDeprecationLogger.method('updateIncomingIntegration', '9.0.0', '/v1/integrations.update');
 		if (!this.userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'updateOutgoingIntegration',
 			});
 		}

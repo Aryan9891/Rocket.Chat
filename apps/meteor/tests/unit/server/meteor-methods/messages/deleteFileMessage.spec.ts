@@ -28,7 +28,6 @@ p.noCallThru().load('../../../../../server/meteor-methods/messages/deleteFileMes
 	'meteor/meteor': {
 		Meteor: {
 			userId: meteorUserIdMock,
-			Error: ClientSafeError,
 			methods: meteorMethodsMock,
 		},
 	},
@@ -38,6 +37,7 @@ p.noCallThru().load('../../../../../server/meteor-methods/messages/deleteFileMes
 	'@rocket.chat/models': modelsMock,
 	'@rocket.chat/core-services': {
 		Upload: { canDeleteFile: canDeleteFileMock },
+		ClientSafeError,
 	},
 	'../../lib/media/file-upload': {
 		FileUpload: { getStore: fileUploadGetStoreMock },

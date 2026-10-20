@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages, Users, Rooms } from '@rocket.chat/models';
@@ -23,13 +24,13 @@ export const getUserMentionsByChannel = async (
 
 	const user = await Users.findOneById(userId);
 	if (!user) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user');
+		throw new ClientSafeError('error-invalid-user', 'Invalid user');
 	}
 
 	const room = await Rooms.findOneById(roomId);
 
 	if (!room || !(await canAccessRoomAsync(room, user))) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'getUserMentionsByChannel',
 		});
 	}
@@ -43,7 +44,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'getUserMentionsByChannel',
 			});
 		}

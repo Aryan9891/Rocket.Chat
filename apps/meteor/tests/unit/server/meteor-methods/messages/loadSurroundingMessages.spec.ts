@@ -1,4 +1,3 @@
-import { ClientSafeError } from '@rocket.chat/core-services';
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 import p from 'proxyquire';
@@ -26,7 +25,6 @@ p.noCallThru().load('../../../../../server/meteor-methods/messages/loadSurroundi
 	'meteor/meteor': {
 		Meteor: {
 			userId: meteorUserIdMock,
-			Error: ClientSafeError,
 			methods: meteorMethodsMock,
 		},
 	},

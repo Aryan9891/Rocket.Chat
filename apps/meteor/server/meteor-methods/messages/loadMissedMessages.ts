@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages } from '@rocket.chat/models';
@@ -23,7 +24,7 @@ Meteor.methods<ServerMethods>({
 		const fromId = Meteor.userId() ?? undefined;
 
 		if (!rid) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'getUsersOfRoom' });
+			throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'getUsersOfRoom' });
 		}
 
 		if (!(await canAccessRoomIdAsync(rid, fromId))) {

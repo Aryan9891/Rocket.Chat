@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { INewOutgoingIntegration, IOutgoingIntegration } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Integrations } from '@rocket.chat/models';
@@ -52,7 +53,7 @@ export const addOutgoingIntegration = async (userId: string, integration: INewOu
 		(!(await hasPermissionAsync(userId, 'manage-outgoing-integrations')) &&
 			!(await hasPermissionAsync(userId, 'manage-own-outgoing-integrations')))
 	) {
-		throw new Meteor.Error('not_authorized');
+		throw new ClientSafeError('not_authorized');
 	}
 
 	if (integration.script?.trim()) {
@@ -79,7 +80,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('addOutgoingIntegration', '9.0.0', '/v1/integrations.create');
 		const { userId } = this;
 		if (!userId) {
-			throw new Meteor.Error('Invalid User');
+			throw new ClientSafeError('Invalid User');
 		}
 
 		return addOutgoingIntegration(userId, integration);

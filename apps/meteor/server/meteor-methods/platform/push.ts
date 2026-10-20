@@ -1,4 +1,4 @@
-import { Push } from '@rocket.chat/core-services';
+import { Push, ClientSafeError } from '@rocket.chat/core-services';
 import type { IPushToken } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { PushToken } from '@rocket.chat/models';
@@ -42,7 +42,7 @@ Meteor.methods<ServerMethods>({
 
 		// The if user id is set then user id should match on client and connection
 		if (!this.userId || (options.userId && options.userId !== this.userId)) {
-			throw new Meteor.Error(403, 'Forbidden access');
+			throw new ClientSafeError(403, 'Forbidden access');
 		}
 
 		// Retain old behavior: if id is not specified but userId is explicitly set, then update the user's first token
@@ -69,7 +69,7 @@ Meteor.methods<ServerMethods>({
 
 		check(id, String);
 		if (!this.userId) {
-			throw new Meteor.Error(403, 'Forbidden access');
+			throw new ClientSafeError(403, 'Forbidden access');
 		}
 
 		logger.debug({ msg: 'Setting userId for app', userId: this.userId, appId: id });

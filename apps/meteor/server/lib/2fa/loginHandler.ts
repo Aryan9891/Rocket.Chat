@@ -1,13 +1,13 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { Accounts } from 'meteor/accounts-base';
 import { check } from 'meteor/check';
-import { Meteor } from 'meteor/meteor';
 import { OAuth } from 'meteor/oauth';
 
 import { checkCodeForUser } from './code';
 import { callbacks } from '../callbacks';
 
 // OAuth sets `meteorError` only for real Meteor.Error instances when storing them
-const isStoredMeteorError = (error: any): error is Meteor.Error => {
+const isStoredMeteorError = (error: any): error is ClientSafeError => {
 	return error?.meteorError !== undefined || error?.errorType === 'Meteor.Error';
 };
 
@@ -62,9 +62,9 @@ const copyTo = <T extends Error>(from: T, to: T): T => {
 	return to;
 };
 
-const recreateError = (errorDoc: Error | Meteor.Error): Error | Meteor.Error => {
+const recreateError = (errorDoc: Error | ClientSafeError): Error | ClientSafeError => {
 	if (isStoredMeteorError(errorDoc)) {
-		const error = new Meteor.Error('');
+		const error = new ClientSafeError('');
 		return copyTo(errorDoc, error);
 	}
 

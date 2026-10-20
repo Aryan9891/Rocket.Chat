@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { SettingEditor, SettingValue } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Settings } from '@rocket.chat/models';
@@ -25,7 +26,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('saveSetting', '9.0.0', '/v1/settings/:_id');
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('error-action-not-allowed', 'Editing settings is not allowed', {
+			throw new ClientSafeError('error-action-not-allowed', 'Editing settings is not allowed', {
 				method: 'saveSetting',
 			});
 		}
@@ -35,7 +36,7 @@ Meteor.methods<ServerMethods>({
 			!(await hasAllPermissionAsync(uid, ['manage-selected-settings', getSettingPermissionId(_id)]))
 		) {
 			// TODO use the same function
-			throw new Meteor.Error('error-action-not-allowed', 'Editing settings is not allowed', {
+			throw new ClientSafeError('error-action-not-allowed', 'Editing settings is not allowed', {
 				method: 'saveSetting',
 				settingId: _id,
 			});
@@ -46,7 +47,7 @@ Meteor.methods<ServerMethods>({
 
 		// Disable custom scripts in cloud trials to prevent phishing campaigns
 		if (disableCustomScripts() && /^Custom_Script_/.test(_id)) {
-			throw new Meteor.Error('error-action-not-allowed', 'Editing settings is not allowed', {
+			throw new ClientSafeError('error-action-not-allowed', 'Editing settings is not allowed', {
 				method: 'saveSetting',
 				settingId: _id,
 			});
@@ -74,7 +75,7 @@ Meteor.methods<ServerMethods>({
 			validateSettingRules([{ _id, value }]);
 		} catch (error) {
 			if (error instanceof SettingValidationError) {
-				throw new Meteor.Error('error-setting-validation-failed', error.message);
+				throw new ClientSafeError('error-setting-validation-failed', error.message);
 			}
 			throw error;
 		}

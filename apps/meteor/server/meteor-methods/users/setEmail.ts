@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { check } from 'meteor/check';
@@ -19,7 +20,7 @@ export const setEmailFunction = async (email: string, user: Meteor.User | IUser)
 	check(email, String);
 
 	if (!settings.get('Accounts_AllowEmailChange')) {
-		throw new Meteor.Error('error-action-not-allowed', 'Changing email is not allowed', {
+		throw new ClientSafeError('error-action-not-allowed', 'Changing email is not allowed', {
 			method: 'setEmail',
 			action: 'Changing_email',
 		});
@@ -30,7 +31,7 @@ export const setEmailFunction = async (email: string, user: Meteor.User | IUser)
 	}
 
 	if (!(await setEmail(user._id, email))) {
-		throw new Meteor.Error('error-could-not-change-email', 'Could not change email', {
+		throw new ClientSafeError('error-could-not-change-email', 'Could not change email', {
 			method: 'setEmail',
 		});
 	}
@@ -44,7 +45,7 @@ Meteor.methods<ServerMethods>({
 		const user = await Meteor.userAsync();
 
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'setEmail' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'setEmail' });
 		}
 
 		return setEmailFunction(email, user);

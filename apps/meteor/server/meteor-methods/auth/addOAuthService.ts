@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -15,7 +16,7 @@ declare module '@rocket.chat/ddp-client' {
 
 export const addOAuthServiceMethod = async (userId: string, name: string): Promise<void> => {
 	if ((await hasPermissionAsync(userId, 'add-oauth-service')) !== true) {
-		throw new Meteor.Error('error-action-not-allowed', 'Adding OAuth Services is not allowed', {
+		throw new ClientSafeError('error-action-not-allowed', 'Adding OAuth Services is not allowed', {
 			method: 'addOAuthService',
 			action: 'Adding_OAuth_Services',
 		});
@@ -32,7 +33,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'addOAuthService' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'addOAuthService' });
 		}
 
 		return addOAuthServiceMethod(userId, name);

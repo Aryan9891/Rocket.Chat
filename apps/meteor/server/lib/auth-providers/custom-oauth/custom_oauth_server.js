@@ -1,4 +1,4 @@
-import { LDAP } from '@rocket.chat/core-services';
+import { LDAP, ClientSafeError } from '@rocket.chat/core-services';
 import { Logger } from '@rocket.chat/logger';
 import { Users } from '@rocket.chat/models';
 import { serverFetch as fetch } from '@rocket.chat/server-fetch';
@@ -32,7 +32,7 @@ export class CustomOAuth {
 
 		this.name = name;
 		if (!Match.test(this.name, String)) {
-			throw new Meteor.Error('CustomOAuth: Name is required and must be String');
+			throw new ClientSafeError('CustomOAuth: Name is required and must be String');
 		}
 
 		if (Services[this.name]) {
@@ -57,11 +57,11 @@ export class CustomOAuth {
 
 	configure(options) {
 		if (!Match.test(options, Object)) {
-			throw new Meteor.Error('CustomOAuth: Options is required and must be Object');
+			throw new ClientSafeError('CustomOAuth: Options is required and must be Object');
 		}
 
 		if (!Match.test(options.serverURL, String)) {
-			throw new Meteor.Error('CustomOAuth: Options.serverURL is required and must be String');
+			throw new ClientSafeError('CustomOAuth: Options.serverURL is required and must be String');
 		}
 
 		if (!Match.test(options.tokenPath, String)) {
@@ -275,7 +275,7 @@ export class CustomOAuth {
 
 	async getEmailFromPath(accessToken) {
 		if (!this.emailPath) {
-			throw new Meteor.Error('CustomOAuth: emailPath is required');
+			throw new ClientSafeError('CustomOAuth: emailPath is required');
 		}
 
 		const params = {};
@@ -316,7 +316,7 @@ export class CustomOAuth {
 			const value = fromTemplate(this.usernameField, data);
 
 			if (!value) {
-				throw new Meteor.Error('field_not_found', `Username field "${this.usernameField}" not found in data`, data);
+				throw new ClientSafeError('field_not_found', `Username field "${this.usernameField}" not found in data`, data);
 			}
 			return value;
 		} catch (error) {
@@ -329,7 +329,7 @@ export class CustomOAuth {
 			const value = fromTemplate(this.emailField, data);
 
 			if (!value) {
-				throw new Meteor.Error('field_not_found', `Email field "${this.emailField}" not found in data`, data);
+				throw new ClientSafeError('field_not_found', `Email field "${this.emailField}" not found in data`, data);
 			}
 			return value;
 		} catch (error) {
@@ -413,7 +413,7 @@ export class CustomOAuth {
 				}
 
 				if (this.mergeUsers !== true) {
-					throw new Meteor.Error('CustomOAuth', `User with username ${user.username} already exists`);
+					throw new ClientSafeError('CustomOAuth', `User with username ${user.username} already exists`);
 				}
 
 				const serviceIdKey = `services.${serviceName}.id`;

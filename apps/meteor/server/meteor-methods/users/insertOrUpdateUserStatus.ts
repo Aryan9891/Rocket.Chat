@@ -1,4 +1,4 @@
-import { api } from '@rocket.chat/core-services';
+import { api, ClientSafeError } from '@rocket.chat/core-services';
 import type { ICustomUserStatus } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import type { InsertionModel } from '@rocket.chat/model-typings';
@@ -30,11 +30,11 @@ declare module '@rocket.chat/ddp-client' {
 
 export const insertOrUpdateUserStatus = async (userId: string, userStatusData: InsertOrUpdateUserStatus): Promise<string | boolean> => {
 	if (!(await hasPermissionAsync(userId, 'manage-user-status'))) {
-		throw new Meteor.Error('not_authorized');
+		throw new ClientSafeError('not_authorized');
 	}
 
 	if (!trim(userStatusData.name)) {
-		throw new Meteor.Error('error-the-field-is-required', 'The field Name is required', {
+		throw new ClientSafeError('error-the-field-is-required', 'The field Name is required', {
 			method: 'insertOrUpdateUserStatus',
 			field: 'Name',
 		});
@@ -45,7 +45,7 @@ export const insertOrUpdateUserStatus = async (userId: string, userStatusData: I
 	const nameValidation = /[><&"']/;
 
 	if (nameValidation.test(userStatusData.name)) {
-		throw new Meteor.Error('error-input-is-not-a-valid-field', `${userStatusData.name} is not a valid name`, {
+		throw new ClientSafeError('error-input-is-not-a-valid-field', `${userStatusData.name} is not a valid name`, {
 			method: 'insertOrUpdateUserStatus',
 			input: userStatusData.name,
 			field: 'Name',
@@ -57,14 +57,14 @@ export const insertOrUpdateUserStatus = async (userId: string, userStatusData: I
 		: await CustomUserStatus.findOneByName(userStatusData.name, { projection: { _id: 1 } });
 
 	if (conflictingUserStatus) {
-		throw new Meteor.Error('Custom_User_Status_Error_Name_Already_In_Use', 'The custom user status name is already in use', {
+		throw new ClientSafeError('Custom_User_Status_Error_Name_Already_In_Use', 'The custom user status name is already in use', {
 			method: 'insertOrUpdateUserStatus',
 		});
 	}
 
 	const validStatusTypes = ['online', 'away', 'busy', 'offline'];
 	if (userStatusData.statusType && validStatusTypes.indexOf(userStatusData.statusType) < 0) {
-		throw new Meteor.Error('error-input-is-not-a-valid-field', `${userStatusData.statusType} is not a valid status type`, {
+		throw new ClientSafeError('error-input-is-not-a-valid-field', `${userStatusData.statusType} is not a valid status type`, {
 			method: 'insertOrUpdateUserStatus',
 			input: userStatusData.statusType,
 			field: 'StatusType',
@@ -103,7 +103,7 @@ Meteor.methods<ServerMethods>({
 	async insertOrUpdateUserStatus(userStatusData) {
 		methodDeprecationLogger.method('insertOrUpdateUserStatus', '9.0.0', ['/v1/custom-user-status.create', '/v1/custom-user-status.update']);
 		if (!this.userId) {
-			throw new Meteor.Error('not_authorized');
+			throw new ClientSafeError('not_authorized');
 		}
 
 		return insertOrUpdateUserStatus(this.userId, userStatusData);

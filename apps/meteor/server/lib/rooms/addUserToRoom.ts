@@ -1,9 +1,8 @@
 import { Apps, AppEvents } from '@rocket.chat/apps';
 import { AppsEngineException } from '@rocket.chat/apps-engine/definition/exceptions';
-import { Message, Team, Room } from '@rocket.chat/core-services';
+import { Message, Team, Room, ClientSafeError } from '@rocket.chat/core-services';
 import { isBannedSubscription, isRoomNativeFederated, type IUser } from '@rocket.chat/core-typings';
 import { Subscriptions, Users, Rooms } from '@rocket.chat/models';
-import { Meteor } from 'meteor/meteor';
 
 import { RoomMemberActions } from '../../../definition/IRoomTypeConfig';
 import { callbacks } from '../callbacks';
@@ -36,7 +35,7 @@ export const addUserToRoom = async (
 	const room = await Rooms.findOneById(rid);
 
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'addUserToRoom',
 		});
 	}
@@ -45,7 +44,7 @@ export const addUserToRoom = async (
 	const roomDirectives = roomCoordinator.getRoomDirectives(room.t);
 
 	if (!userToBeAdded) {
-		throw new Meteor.Error('user-not-found');
+		throw new ClientSafeError('user-not-found');
 	}
 
 	if (
@@ -61,7 +60,7 @@ export const addUserToRoom = async (
 		await beforeAddUserToRoomPatch([userToBeAdded.username!], room, inviterUser);
 		await beforeAddUserToRoom.run({ user: userToBeAdded, inviter: inviterUser }, room);
 	} catch (error) {
-		throw new Meteor.Error((error as any)?.message);
+		throw new ClientSafeError((error as any)?.message);
 	}
 
 	// TODO: are we calling this twice?
@@ -72,7 +71,7 @@ export const addUserToRoom = async (
 		await Apps.self?.triggerEvent(AppEvents.IPreRoomUserJoined, room, userToBeAdded, inviter);
 	} catch (error: any) {
 		if (error.name === AppsEngineException.name) {
-			throw new Meteor.Error('error-app-prevented', error.message);
+			throw new ClientSafeError('error-app-prevented', error.message);
 		}
 
 		throw error;

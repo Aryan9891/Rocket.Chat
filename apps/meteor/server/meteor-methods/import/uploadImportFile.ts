@@ -1,4 +1,4 @@
-import { Import } from '@rocket.chat/core-services';
+import { Import, ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
@@ -19,7 +19,11 @@ export const executeUploadImportFile = async (
 ): Promise<void> => {
 	const importer = Importers.get(importerKey);
 	if (!importer) {
-		throw new Meteor.Error('error-importer-not-defined', `The importer (${importerKey}) has no import class defined.`, 'uploadImportFile');
+		throw new ClientSafeError(
+			'error-importer-not-defined',
+			`The importer (${importerKey}) has no import class defined.`,
+			'uploadImportFile',
+		);
 	}
 
 	const operation = await Import.newOperation(userId, importer.name, importer.key);
@@ -69,11 +73,11 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', 'uploadImportFile');
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', 'uploadImportFile');
 		}
 
 		if (!(await hasPermissionAsync(userId, 'run-import'))) {
-			throw new Meteor.Error('error-action-not-allowed', 'Importing is not allowed', 'uploadImportFile');
+			throw new ClientSafeError('error-action-not-allowed', 'Importing is not allowed', 'uploadImportFile');
 		}
 
 		await executeUploadImportFile(userId, binaryContent, contentType, fileName, importerKey);

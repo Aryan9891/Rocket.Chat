@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users } from '@rocket.chat/models';
@@ -18,13 +19,13 @@ declare module '@rocket.chat/ddp-client' {
 export const executeDeleteUser = async (fromUserId: IUser['_id'], userId: IUser['_id'], confirmRelinquish = false): Promise<boolean> => {
 	const user = await Users.findOneById(userId);
 	if (!user) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user to delete', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user to delete', {
 			method: 'deleteUser',
 		});
 	}
 
 	if (user.type === 'app') {
-		throw new Meteor.Error('error-cannot-delete-app-user', 'Deleting app user is not allowed', {
+		throw new ClientSafeError('error-cannot-delete-app-user', 'Deleting app user is not allowed', {
 			method: 'deleteUser',
 		});
 	}
@@ -34,7 +35,7 @@ export const executeDeleteUser = async (fromUserId: IUser['_id'], userId: IUser[
 	const userIsAdmin = user.roles?.indexOf('admin') > -1;
 
 	if (adminCount === 1 && userIsAdmin) {
-		throw new Meteor.Error('error-action-not-allowed', 'Leaving the app without admins is not allowed', {
+		throw new ClientSafeError('error-action-not-allowed', 'Leaving the app without admins is not allowed', {
 			method: 'deleteUser',
 			action: 'Remove_last_admin',
 		});
@@ -52,13 +53,13 @@ Meteor.methods<ServerMethods>({
 
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'deleteUser',
 			});
 		}
 
 		if ((await hasPermissionAsync(uid, 'delete-user')) !== true) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'deleteUser',
 			});
 		}

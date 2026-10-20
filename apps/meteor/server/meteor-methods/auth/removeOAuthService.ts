@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Settings } from '@rocket.chat/models';
 import { capitalize } from '@rocket.chat/tools';
@@ -19,7 +20,7 @@ export const removeCustomOAuthSettings = async (name: string): Promise<void> => 
 	const normalized = capitalize(name.toLowerCase().replace(/[^a-z0-9_]/g, ''));
 
 	if (!normalized) {
-		throw new Meteor.Error('error-invalid-name', 'Invalid OAuth service name', { method: 'removeOAuthService' });
+		throw new ClientSafeError('error-invalid-name', 'Invalid OAuth service name', { method: 'removeOAuthService' });
 	}
 
 	const settingsIds = [
@@ -72,13 +73,13 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'removeOAuthService',
 			});
 		}
 
 		if ((await hasPermissionAsync(userId, 'add-oauth-service')) !== true) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'removeOAuthService' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'removeOAuthService' });
 		}
 
 		await removeCustomOAuthSettings(name);

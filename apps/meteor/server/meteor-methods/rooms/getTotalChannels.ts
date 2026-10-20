@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
@@ -15,7 +16,7 @@ Meteor.methods<ServerMethods>({
 	getTotalChannels() {
 		methodDeprecationLogger.method('getTotalChannels', '9.0.0', '/v1/channels.list');
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'getTotalChannels',
 			});
 		}

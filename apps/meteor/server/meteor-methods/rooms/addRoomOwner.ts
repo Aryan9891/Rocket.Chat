@@ -1,4 +1,4 @@
-import { api, Message, Team } from '@rocket.chat/core-services';
+import { api, Message, Team, ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom, IUser } from '@rocket.chat/core-typings';
 import { isRoomFederated } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
@@ -27,7 +27,7 @@ export const addRoomOwner = async (fromUserId: IUser['_id'], rid: IRoom['_id'], 
 
 	const room = await Rooms.findOneById(rid, { projection: { t: 1, federated: 1, federation: 1 } });
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'addRoomOwner',
 		});
 	}
@@ -35,7 +35,7 @@ export const addRoomOwner = async (fromUserId: IUser['_id'], rid: IRoom['_id'], 
 	const isFederated = isRoomFederated(room);
 
 	if (!(await hasPermissionAsync(fromUserId, 'set-owner', rid)) && !isFederated) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 			method: 'addRoomOwner',
 		});
 	}
@@ -47,7 +47,7 @@ export const addRoomOwner = async (fromUserId: IUser['_id'], rid: IRoom['_id'], 
 	const user = await Users.findOneById(userId);
 
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'addRoomOwner',
 		});
 	}
@@ -55,13 +55,13 @@ export const addRoomOwner = async (fromUserId: IUser['_id'], rid: IRoom['_id'], 
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 
 	if (!subscription) {
-		throw new Meteor.Error('error-user-not-in-room', 'User is not in this room', {
+		throw new ClientSafeError('error-user-not-in-room', 'User is not in this room', {
 			method: 'addRoomOwner',
 		});
 	}
 
 	if (subscription.roles && Array.isArray(subscription.roles) === true && subscription.roles.includes('owner') === true) {
-		throw new Meteor.Error('error-user-already-owner', 'User is already an owner', {
+		throw new ClientSafeError('error-user-already-owner', 'User is already an owner', {
 			method: 'addRoomOwner',
 		});
 	}
@@ -77,7 +77,7 @@ export const addRoomOwner = async (fromUserId: IUser['_id'], rid: IRoom['_id'], 
 
 	const fromUser = await Users.findOneById(fromUserId);
 	if (!fromUser) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'addRoomLeader',
 		});
 	}
@@ -112,7 +112,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'addRoomOwner',
 			});
 		}

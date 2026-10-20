@@ -1,4 +1,4 @@
-import { Upload } from '@rocket.chat/core-services';
+import { Upload, ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Users } from '@rocket.chat/models';
@@ -20,7 +20,7 @@ export const resetAvatar = async (fromUserId: IUser['_id'], userId: IUser['_id']
 	const canEditOtherUserAvatar = await hasPermissionAsync(fromUserId, 'edit-other-user-avatar');
 
 	if (!settings.get('Accounts_AllowUserAvatarChange') && !canEditOtherUserAvatar) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 			method: 'resetAvatar',
 		});
 	}
@@ -29,7 +29,7 @@ export const resetAvatar = async (fromUserId: IUser['_id'], userId: IUser['_id']
 
 	if (userId !== fromUserId) {
 		if (!canEditOtherUserAvatar) {
-			throw new Meteor.Error('error-unauthorized', 'Unauthorized', {
+			throw new ClientSafeError('error-unauthorized', 'Unauthorized', {
 				method: 'resetAvatar',
 			});
 		}
@@ -40,7 +40,7 @@ export const resetAvatar = async (fromUserId: IUser['_id'], userId: IUser['_id']
 	}
 
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-desired-user', 'Invalid desired user', {
+		throw new ClientSafeError('error-invalid-desired-user', 'Invalid desired user', {
 			method: 'resetAvatar',
 		});
 	}
@@ -53,7 +53,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('resetAvatar', '9.0.0', '/v1/users.resetAvatar');
 		const uid = Meteor.userId();
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'resetAvatar',
 			});
 		}

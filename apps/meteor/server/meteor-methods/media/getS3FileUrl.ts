@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms, Uploads } from '@rocket.chat/models';
 import { check } from 'meteor/check';
@@ -19,15 +20,15 @@ Meteor.methods<ServerMethods>({
 		check(fileId, String);
 		const uid = Meteor.userId();
 		if (settings.get<boolean>('FileUpload_ProtectFiles') && !uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'sendFileMessage' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'sendFileMessage' });
 		}
 		const file = await Uploads.findOneById(fileId);
 		if (!file?.rid) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed');
+			throw new ClientSafeError('error-not-allowed', 'Not allowed');
 		}
 		const room = await Rooms.findOneById(file.rid);
 		if (uid && room && !(await canAccessRoomAsync(room, { _id: uid }))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed');
+			throw new ClientSafeError('error-not-allowed', 'Not allowed');
 		}
 
 		return UploadFS.getStore('AmazonS3:Uploads').getRedirectURL(file);

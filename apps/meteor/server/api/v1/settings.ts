@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type {
 	FacebookOAuthConfiguration,
 	ISetting,
@@ -248,7 +249,7 @@ API.v1.post(
 	async function action() {
 		const { name } = this.bodyParams;
 		if (!name?.trim()) {
-			throw new Meteor.Error('error-name-param-not-provided', 'The parameter "name" is required');
+			throw new ClientSafeError('error-name-param-not-provided', 'The parameter "name" is required');
 		}
 
 		await addOAuthServiceMethod(this.userId, name);
@@ -281,7 +282,7 @@ API.v1.post(
 	async function action() {
 		const { name } = this.bodyParams;
 		if (!name?.trim()) {
-			throw new Meteor.Error('error-name-param-not-provided', 'The parameter "name" is required');
+			throw new ClientSafeError('error-name-param-not-provided', 'The parameter "name" is required');
 		}
 
 		await removeCustomOAuthSettings(name);
@@ -404,7 +405,7 @@ API.v1.post(
 	async function action() {
 		const { _id } = this.urlParams;
 		if (typeof _id !== 'string') {
-			throw new Meteor.Error('error-id-param-not-provided', 'The parameter "id" is required');
+			throw new ClientSafeError('error-id-param-not-provided', 'The parameter "id" is required');
 		}
 
 		if (disableCustomScripts() && /^Custom_Script_/.test(_id)) {

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
 import { Meteor } from 'meteor/meteor';
@@ -19,19 +20,19 @@ Meteor.methods<ServerMethods>({
 	async crowd_test_connection() {
 		const user = await Meteor.userAsync();
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'crowd_test_connection',
 			});
 		}
 
 		if (!(await hasPermissionAsync(user, 'test-admin-options'))) {
-			throw new Meteor.Error('error-not-authorized', 'Not authorized', {
+			throw new ClientSafeError('error-not-authorized', 'Not authorized', {
 				method: 'crowd_test_connection',
 			});
 		}
 
 		if (settings.get('CROWD_Enable') !== true) {
-			throw new Meteor.Error('crowd_disabled');
+			throw new ClientSafeError('crowd_disabled');
 		}
 
 		try {
@@ -47,17 +48,17 @@ Meteor.methods<ServerMethods>({
 				msg: 'Invalid crowd connection details, check the url and application username/password and make sure this server is allowed to speak to crowd',
 				err,
 			});
-			throw new Meteor.Error('Invalid connection details', '', { method: 'crowd_test_connection' });
+			throw new ClientSafeError('Invalid connection details', '', { method: 'crowd_test_connection' });
 		}
 	},
 	async crowd_sync_users() {
 		const user = await Meteor.userAsync();
 		if (settings.get('CROWD_Enable') !== true) {
-			throw new Meteor.Error('crowd_disabled');
+			throw new ClientSafeError('crowd_disabled');
 		}
 
 		if (!user || !(await hasPermissionAsync(user, 'sync-auth-services-users'))) {
-			throw new Meteor.Error('error-not-authorized', 'Not authorized', {
+			throw new ClientSafeError('error-not-authorized', 'Not authorized', {
 				method: 'crowd_sync_users',
 			});
 		}
@@ -75,7 +76,7 @@ Meteor.methods<ServerMethods>({
 			};
 		} catch (err) {
 			logger.error({ msg: 'Error syncing user data. ', err });
-			throw new Meteor.Error('Error syncing user data', '', { method: 'crowd_sync_users' });
+			throw new ClientSafeError('Error syncing user data', '', { method: 'crowd_sync_users' });
 		}
 	},
 });

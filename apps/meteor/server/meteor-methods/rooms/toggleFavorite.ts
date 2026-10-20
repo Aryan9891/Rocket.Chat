@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Subscriptions } from '@rocket.chat/models';
@@ -17,7 +18,7 @@ declare module '@rocket.chat/ddp-client' {
 export const toggleFavoriteMethod = async (userId: string, rid: IRoom['_id'], favorite?: boolean): Promise<number> => {
 	const userSubscription = await Subscriptions.findOneByRoomIdAndUserId(rid, userId);
 	if (!userSubscription) {
-		throw new Meteor.Error('error-invalid-subscription', 'You must be part of a room to favorite it', { method: 'toggleFavorite' });
+		throw new ClientSafeError('error-invalid-subscription', 'You must be part of a room to favorite it', { method: 'toggleFavorite' });
 	}
 
 	const { modifiedCount } = await Subscriptions.setFavoriteByRoomIdAndUserId(rid, userId, favorite);
@@ -37,7 +38,7 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'toggleFavorite',
 			});
 		}

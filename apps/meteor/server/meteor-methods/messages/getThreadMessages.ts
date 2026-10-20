@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages, Rooms } from '@rocket.chat/models';
@@ -23,19 +24,19 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('getThreadMessages', '9.0.0', '/v1/chat.getThreadMessages');
 
 		if ((limit ?? 0) > MAX_LIMIT) {
-			throw new Meteor.Error('error-not-allowed', `max limit: ${MAX_LIMIT}`, {
+			throw new ClientSafeError('error-not-allowed', `max limit: ${MAX_LIMIT}`, {
 				method: 'getThreadMessages',
 			});
 		}
 
 		if (!Meteor.userId() || !settings.get('Threads_enabled')) {
-			throw new Meteor.Error('error-not-allowed', 'Threads Disabled', {
+			throw new ClientSafeError('error-not-allowed', 'Threads Disabled', {
 				method: 'getThreadMessages',
 			});
 		}
 
 		if (typeof tmid !== 'string') {
-			throw new Meteor.Error('error-invalid-message', 'Invalid message', { method: 'getThreadMessages' });
+			throw new ClientSafeError('error-invalid-message', 'Invalid message', { method: 'getThreadMessages' });
 		}
 
 		const thread = await Messages.findOneById(tmid);
@@ -47,7 +48,7 @@ Meteor.methods<ServerMethods>({
 		const room = await Rooms.findOneById(thread.rid);
 
 		if (!user || !room || !(await canAccessRoomAsync(room, user))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getThreadMessages' });
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'getThreadMessages' });
 		}
 
 		if (!thread.tcount) {

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms, Users } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
@@ -24,7 +25,7 @@ export const setUserPublicAndPrivateKeysMethod = async (
 		const keys = await Users.fetchKeysByUserId(userId);
 
 		if (isKeysResult(keys)) {
-			throw new Meteor.Error('error-keys-already-set', 'Keys already set', {
+			throw new ClientSafeError('error-keys-already-set', 'Keys already set', {
 				method: 'e2e.setUserPublicAndPrivateKeys',
 			});
 		}
@@ -47,13 +48,13 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'e2e.setUserPublicAndPrivateKeys',
 			});
 		}
 
 		if (!keyPair.public_key || !keyPair.private_key) {
-			throw new Meteor.Error('error-invalid-keys', 'Invalid keys', {
+			throw new ClientSafeError('error-invalid-keys', 'Invalid keys', {
 				method: 'e2e.setUserPublicAndPrivateKeys',
 			});
 		}

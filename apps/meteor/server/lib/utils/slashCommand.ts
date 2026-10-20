@@ -157,13 +157,13 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('slashCommand', '9.0.0', '/v1/commands.run');
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'slashCommand',
 			});
 		}
 
 		if (!command?.cmd || !slashCommands.commands[command.cmd]) {
-			throw new Meteor.Error('error-invalid-command', 'Invalid Command Provided', {
+			throw new ClientSafeError('error-invalid-command', 'Invalid Command Provided', {
 				method: 'executeSlashCommandPreview',
 			});
 		}

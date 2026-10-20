@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ICustomUserStatus } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { CustomUserStatus } from '@rocket.chat/models';
@@ -14,7 +15,7 @@ Meteor.methods<ServerMethods>({
 	async listCustomUserStatus() {
 		const currentUserId = Meteor.userId();
 		if (!currentUserId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'listCustomUserStatus',
 			});
 		}

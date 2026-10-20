@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -18,7 +19,7 @@ Meteor.methods<ServerMethods>({
 		try {
 			return getMomentLocale(locale);
 		} catch (error: any) {
-			throw new Meteor.Error(error.message, `Moment locale not found: ${locale}`);
+			throw new ClientSafeError(error.message, `Moment locale not found: ${locale}`);
 		}
 	},
 });

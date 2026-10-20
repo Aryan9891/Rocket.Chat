@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms } from '@rocket.chat/models';
@@ -16,13 +17,13 @@ declare module '@rocket.chat/ddp-client' {
 
 export const setRoomKeyIDMethod = async (userId: string, rid: IRoom['_id'], keyID: string): Promise<void> => {
 	if (!(await canAccessRoomIdAsync(rid, userId))) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'e2e.setRoomKeyID' });
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'e2e.setRoomKeyID' });
 	}
 
 	const room = await Rooms.setE2eKeyId(rid, keyID);
 
 	if (!room) {
-		throw new Meteor.Error('error-room-e2e-key-already-exists', 'E2E Key ID already exists', {
+		throw new ClientSafeError('error-room-e2e-key-already-exists', 'E2E Key ID already exists', {
 			method: 'e2e.setRoomKeyID',
 		});
 	}
@@ -37,11 +38,11 @@ Meteor.methods<ServerMethods>({
 
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'e2e.setRoomKeyID' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'e2e.setRoomKeyID' });
 		}
 
 		if (!rid) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'e2e.setRoomKeyID' });
+			throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'e2e.setRoomKeyID' });
 		}
 
 		await setRoomKeyIDMethod(userId, rid, keyID);

@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ISubscription } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Logger } from '@rocket.chat/logger';
@@ -111,7 +112,7 @@ Meteor.methods<ServerMethods>({
 		methodDeprecationLogger.method('messageSearch', '9.0.0', '/v1/chat.search');
 		const currentUserId = Meteor.userId();
 		if (!currentUserId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'messageSearch',
 			});
 		}

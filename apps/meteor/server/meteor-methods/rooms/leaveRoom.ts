@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Roles, Subscriptions, Rooms } from '@rocket.chat/models';
@@ -21,25 +22,25 @@ declare module '@rocket.chat/ddp-client' {
 export const leaveRoomMethod = async (user: IUser, rid: string): Promise<void> => {
 	const room = await Rooms.findOneById(rid);
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'leaveRoom' });
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'leaveRoom' });
 	}
 
 	if (!user || !(await roomCoordinator.getRoomDirectives(room.t).allowMemberAction(room, RoomMemberActions.LEAVE, user._id))) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'leaveRoom' });
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'leaveRoom' });
 	}
 
 	if (
 		(room.t === 'c' && !(await hasPermissionAsync(user, 'leave-c'))) ||
 		(room.t === 'p' && !(await hasPermissionAsync(user, 'leave-p')))
 	) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'leaveRoom' });
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'leaveRoom' });
 	}
 
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(rid, user._id, {
 		projection: { _id: 1 },
 	});
 	if (!subscription) {
-		throw new Meteor.Error('error-user-not-in-room', 'You are not in this room', {
+		throw new ClientSafeError('error-user-not-in-room', 'You are not in this room', {
 			method: 'leaveRoom',
 		});
 	}
@@ -48,7 +49,7 @@ export const leaveRoomMethod = async (user: IUser, rid: string): Promise<void> =
 	if (await hasRoleAsync(user._id, 'owner', room._id)) {
 		const numOwners = await Roles.countUsersInRole('owner', room._id);
 		if (numOwners === 1) {
-			throw new Meteor.Error('error-you-are-last-owner', 'You are the last owner. Please set new owner before leaving the room.', {
+			throw new ClientSafeError('error-you-are-last-owner', 'You are the last owner. Please set new owner before leaving the room.', {
 				method: 'leaveRoom',
 			});
 		}
@@ -63,13 +64,13 @@ Meteor.methods<ServerMethods>({
 		check(rid, String);
 
 		if (!Meteor.userId()) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'leaveRoom' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'leaveRoom' });
 		}
 
 		const user = (await Meteor.userAsync()) as unknown as IUser;
 
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'leaveRoom' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'leaveRoom' });
 		}
 
 		return leaveRoomMethod(user, rid);

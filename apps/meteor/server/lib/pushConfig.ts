@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { PushToken } from '@rocket.chat/models';
@@ -14,7 +15,7 @@ export const executePushTest = async (userId: IUser['_id'], username: IUser['use
 	const tokens = await PushToken.countTokensByUserId(userId);
 
 	if (tokens === 0) {
-		throw new Meteor.Error('error-no-tokens-for-this-user', 'There are no tokens for this user', {
+		throw new ClientSafeError('error-no-tokens-for-this-user', 'There are no tokens for this user', {
 			method: 'push_test',
 		});
 	}
@@ -44,19 +45,19 @@ Meteor.methods<ServerMethods>({
 		const user = await Meteor.userAsync();
 
 		if (!user) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'push_test',
 			});
 		}
 
 		if (!(await hasPermissionAsync(user, 'test-push-notifications'))) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'push_test',
 			});
 		}
 
 		if (settings.get('Push_enable') !== true) {
-			throw new Meteor.Error('error-push-disabled', 'Push is disabled', {
+			throw new ClientSafeError('error-push-disabled', 'Push is disabled', {
 				method: 'push_test',
 			});
 		}

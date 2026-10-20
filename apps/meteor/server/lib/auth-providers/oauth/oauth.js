@@ -1,6 +1,6 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import { Accounts } from 'meteor/accounts-base';
 import { Match, check } from 'meteor/check';
-import { Meteor } from 'meteor/meteor';
 import { ServiceConfiguration } from 'meteor/service-configuration';
 import _ from 'underscore';
 
@@ -45,7 +45,10 @@ Accounts.registerLoginHandler(async (options) => {
 		// unregisterService was called on it.
 		return {
 			type: 'oauth',
-			error: new Meteor.Error(Accounts.LoginCancelledError.numericError, `No registered oauth service found for: ${service.serviceName}`),
+			error: new ClientSafeError(
+				Accounts.LoginCancelledError.numericError,
+				`No registered oauth service found for: ${service.serviceName}`,
+			),
 		};
 	}
 

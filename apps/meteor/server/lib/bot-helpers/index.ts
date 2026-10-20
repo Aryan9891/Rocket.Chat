@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import { UserStatus } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
@@ -75,12 +76,12 @@ class BotHelpers {
 		const foundRoom = await Rooms.findOneByIdOrName(room);
 
 		if (!foundRoom) {
-			throw new Meteor.Error('invalid-channel');
+			throw new ClientSafeError('invalid-channel');
 		}
 
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'addUserToRoom' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'addUserToRoom' });
 		}
 		await addUsersToRoomMethod(userId, {
 			rid: foundRoom._id,
@@ -92,18 +93,18 @@ class BotHelpers {
 		const foundRoom = await Rooms.findOneByIdOrName(room);
 
 		if (!foundRoom) {
-			throw new Meteor.Error('invalid-channel');
+			throw new ClientSafeError('invalid-channel');
 		}
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user');
+			throw new ClientSafeError('error-invalid-user', 'Invalid user');
 		}
 		await removeUserFromRoomMethod(userId, { rid: foundRoom._id, username: userName });
 	}
 
 	// generic error whenever property access insufficient to fill request
 	requestError() {
-		throw new Meteor.Error('error-not-allowed', 'Bot request not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Bot request not allowed', {
 			method: 'botRequest',
 			action: 'bot_request',
 		});
@@ -209,6 +210,6 @@ Meteor.methods<ServerMethods>({
 		if (userID && (await hasRoleAsync(userID, 'bot'))) {
 			return botHelpers.request(...args, userID);
 		}
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'botRequest' });
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'botRequest' });
 	},
 });

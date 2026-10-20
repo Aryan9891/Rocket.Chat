@@ -1,4 +1,5 @@
 import { Apps, AppEvents } from '@rocket.chat/apps';
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IMessage, IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Messages, Subscriptions, Rooms } from '@rocket.chat/models';
@@ -19,7 +20,7 @@ declare module '@rocket.chat/ddp-client' {
 
 export const starMessage = async (user: IUser, message: Pick<IMessage, 'rid' | '_id'> & { starred: boolean }): Promise<boolean> => {
 	if (!settings.get('Message_AllowStarring')) {
-		throw new Meteor.Error('error-action-not-allowed', 'Message starring not allowed', {
+		throw new ClientSafeError('error-action-not-allowed', 'Message starring not allowed', {
 			method: 'starMessage',
 			action: 'Message_starring',
 		});
@@ -38,11 +39,11 @@ export const starMessage = async (user: IUser, message: Pick<IMessage, 'rid' | '
 	const room = await Rooms.findOneById(message.rid, { projection: { ...roomAccessAttributes, lastMessage: 1 } });
 
 	if (!room) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'starMessage' });
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', { method: 'starMessage' });
 	}
 
 	if (!(await canAccessRoomAsync(room, { _id: user._id }))) {
-		throw new Meteor.Error('not-authorized', 'Not Authorized', { method: 'starMessage' });
+		throw new ClientSafeError('not-authorized', 'Not Authorized', { method: 'starMessage' });
 	}
 
 	if (isTheLastMessage(room, message)) {
@@ -67,7 +68,7 @@ Meteor.methods<ServerMethods>({
 		const user = (await Meteor.userAsync()) as IUser;
 
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'starMessage',
 			});
 		}

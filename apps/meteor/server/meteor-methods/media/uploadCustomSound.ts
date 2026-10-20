@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { RequiredField } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Meteor } from 'meteor/meteor';
@@ -18,7 +19,7 @@ Meteor.methods<ServerMethods>({
 	async uploadCustomSound(binaryContent, contentType, soundData) {
 		methodDeprecationLogger.method('uploadCustomSound', '9.0.0', ['/v1/custom-sounds.create', '/v1/custom-sounds.update']);
 		if (!this.userId || !(await hasPermissionAsync(this.userId, 'manage-sounds'))) {
-			throw new Meteor.Error('not_authorized');
+			throw new ClientSafeError('not_authorized');
 		}
 		const buffer = Buffer.from(binaryContent, 'binary');
 		await uploadCustomSound(buffer, contentType, soundData);

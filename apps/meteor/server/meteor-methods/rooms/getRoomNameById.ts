@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Subscriptions, Rooms } from '@rocket.chat/models';
@@ -20,7 +21,7 @@ Meteor.methods<ServerMethods>({
 		check(rid, String);
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'getRoomNameById',
 			});
 		}
@@ -28,7 +29,7 @@ Meteor.methods<ServerMethods>({
 		const room = await Rooms.findOneById(rid);
 
 		if (room == null) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'getRoomNameById',
 			});
 		}
@@ -41,7 +42,7 @@ Meteor.methods<ServerMethods>({
 		}
 
 		if (room.t !== 'c' || (await hasPermissionAsync(userId, 'view-c-room')) !== true) {
-			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 				method: 'getRoomNameById',
 			});
 		}

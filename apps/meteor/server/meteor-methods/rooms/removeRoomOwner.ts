@@ -1,4 +1,4 @@
-import { api, Message, Team } from '@rocket.chat/core-services';
+import { api, Message, Team, ClientSafeError } from '@rocket.chat/core-services';
 import { isRoomFederated } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Subscriptions, Rooms, Users, Roles } from '@rocket.chat/models';
@@ -25,20 +25,20 @@ export const removeRoomOwner = async (fromUserId: string, rid: string, userId: s
 
 	const room = await Rooms.findOneById(rid, { projection: { t: 1, federated: 1, federation: 1 } });
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'removeRoomOwner',
 		});
 	}
 
 	if (!(await hasPermissionAsync(fromUserId, 'set-owner', rid)) && !isRoomFederated(room)) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 			method: 'removeRoomOwner',
 		});
 	}
 
 	const user = await Users.findOneById(userId);
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomOwner',
 		});
 	}
@@ -46,13 +46,13 @@ export const removeRoomOwner = async (fromUserId: string, rid: string, userId: s
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 
 	if (!subscription) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'removeRoomOwner',
 		});
 	}
 
 	if (Array.isArray(subscription.roles) === false || subscription.roles?.includes('owner') === false) {
-		throw new Meteor.Error('error-user-not-owner', 'User is not an owner', {
+		throw new ClientSafeError('error-user-not-owner', 'User is not an owner', {
 			method: 'removeRoomOwner',
 		});
 	}
@@ -60,7 +60,7 @@ export const removeRoomOwner = async (fromUserId: string, rid: string, userId: s
 	const numOwners = await Roles.countUsersInRole('owner', rid);
 
 	if (numOwners === 1) {
-		throw new Meteor.Error('error-remove-last-owner', 'This is the last owner. Please set a new owner before removing this one.', {
+		throw new ClientSafeError('error-remove-last-owner', 'This is the last owner. Please set a new owner before removing this one.', {
 			method: 'removeRoomOwner',
 		});
 	}
@@ -76,7 +76,7 @@ export const removeRoomOwner = async (fromUserId: string, rid: string, userId: s
 
 	const fromUser = await Users.findOneById(fromUserId);
 	if (!fromUser) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomOwner',
 		});
 	}
@@ -111,7 +111,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'removeRoomOwner',
 			});
 		}

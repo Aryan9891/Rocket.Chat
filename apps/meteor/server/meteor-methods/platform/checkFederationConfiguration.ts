@@ -1,4 +1,4 @@
-import { Federation, FederationEE, Authorization } from '@rocket.chat/core-services';
+import { Federation, FederationEE, Authorization, ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { License } from '@rocket.chat/license';
 import { Meteor } from 'meteor/meteor';
@@ -19,13 +19,13 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'checkFederationConfiguration',
 			});
 		}
 
 		if (!(await Authorization.hasPermission(uid, 'view-privileged-setting'))) {
-			throw new Meteor.Error('error-not-allowed', 'Action not allowed', {
+			throw new ClientSafeError('error-not-allowed', 'Action not allowed', {
 				method: 'checkFederationConfiguration',
 			});
 		}
@@ -67,10 +67,10 @@ Meteor.methods<ServerMethods>({
 			if (successes.length) {
 				const message = ['Configuration could only be partially verified'].concat(successes).concat(errors).join(', ');
 
-				throw new Meteor.Error('error-invalid-configuration', message, { method: 'checkFederationConfiguration' });
+				throw new ClientSafeError('error-invalid-configuration', message, { method: 'checkFederationConfiguration' });
 			}
 
-			throw new Meteor.Error('error-invalid-configuration', ['Invalid configuration'].concat(errors).join(', '), {
+			throw new ClientSafeError('error-invalid-configuration', ['Invalid configuration'].concat(errors).join(', '), {
 				method: 'checkFederationConfiguration',
 			});
 		}

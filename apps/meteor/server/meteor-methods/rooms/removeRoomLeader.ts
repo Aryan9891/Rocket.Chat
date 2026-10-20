@@ -1,4 +1,4 @@
-import { api, Message, Team } from '@rocket.chat/core-services';
+import { api, Message, Team, ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom, IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Subscriptions, Users } from '@rocket.chat/models';
@@ -23,7 +23,7 @@ export const removeRoomLeader = async (fromUserId: IUser['_id'], rid: IRoom['_id
 	check(userId, String);
 
 	if (!(await hasPermissionAsync(fromUserId, 'set-leader', rid))) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 			method: 'removeRoomLeader',
 		});
 	}
@@ -31,7 +31,7 @@ export const removeRoomLeader = async (fromUserId: IUser['_id'], rid: IRoom['_id
 	const user = await Users.findOneById(userId);
 
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomLeader',
 		});
 	}
@@ -39,13 +39,13 @@ export const removeRoomLeader = async (fromUserId: IUser['_id'], rid: IRoom['_id
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 
 	if (!subscription) {
-		throw new Meteor.Error('error-user-not-in-room', 'User is not in this room', {
+		throw new ClientSafeError('error-user-not-in-room', 'User is not in this room', {
 			method: 'removeRoomLeader',
 		});
 	}
 
 	if (subscription.roles && Array.isArray(subscription.roles) === true && subscription.roles.includes('leader') === false) {
-		throw new Meteor.Error('error-user-not-leader', 'User is not a leader', {
+		throw new ClientSafeError('error-user-not-leader', 'User is not a leader', {
 			method: 'removeRoomLeader',
 		});
 	}
@@ -59,7 +59,7 @@ export const removeRoomLeader = async (fromUserId: IUser['_id'], rid: IRoom['_id
 
 	const fromUser = await Users.findOneById(fromUserId);
 	if (!fromUser) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomLeader',
 		});
 	}
@@ -93,7 +93,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'removeRoomLeader',
 			});
 		}

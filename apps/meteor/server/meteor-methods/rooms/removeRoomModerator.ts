@@ -1,4 +1,4 @@
-import { api, Message, Team } from '@rocket.chat/core-services';
+import { api, Message, Team, ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom, IUser } from '@rocket.chat/core-typings';
 import { isRoomFederated } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
@@ -26,13 +26,13 @@ export const removeRoomModerator = async (fromUserId: IUser['_id'], rid: IRoom['
 
 	const room = await Rooms.findOneById(rid, { projection: { t: 1, federated: 1, federation: 1 } });
 	if (!room) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'removeRoomModerator',
 		});
 	}
 
 	if (!(await hasPermissionAsync(fromUserId, 'set-moderator', rid)) && !isRoomFederated(room)) {
-		throw new Meteor.Error('error-not-allowed', 'Not allowed', {
+		throw new ClientSafeError('error-not-allowed', 'Not allowed', {
 			method: 'removeRoomModerator',
 		});
 	}
@@ -40,7 +40,7 @@ export const removeRoomModerator = async (fromUserId: IUser['_id'], rid: IRoom['
 	const user = await Users.findOneById(userId);
 
 	if (!user?.username) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomModerator',
 		});
 	}
@@ -48,13 +48,13 @@ export const removeRoomModerator = async (fromUserId: IUser['_id'], rid: IRoom['
 	const subscription = await Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 
 	if (!subscription) {
-		throw new Meteor.Error('error-invalid-room', 'Invalid room', {
+		throw new ClientSafeError('error-invalid-room', 'Invalid room', {
 			method: 'removeRoomModerator',
 		});
 	}
 
 	if (subscription.roles && (!Array.isArray(subscription.roles) || !subscription.roles.includes('moderator'))) {
-		throw new Meteor.Error('error-user-not-moderator', 'User is not a moderator', {
+		throw new ClientSafeError('error-user-not-moderator', 'User is not a moderator', {
 			method: 'removeRoomModerator',
 		});
 	}
@@ -70,7 +70,7 @@ export const removeRoomModerator = async (fromUserId: IUser['_id'], rid: IRoom['
 
 	const fromUser = await Users.findOneById(fromUserId);
 	if (!fromUser) {
-		throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+		throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 			method: 'removeRoomModerator',
 		});
 	}
@@ -106,7 +106,7 @@ Meteor.methods<ServerMethods>({
 		const uid = Meteor.userId();
 
 		if (!uid) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'removeRoomModerator',
 			});
 		}

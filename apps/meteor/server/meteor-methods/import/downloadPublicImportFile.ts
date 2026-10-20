@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import type { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
-import { Import } from '@rocket.chat/core-services';
+import { Import, ClientSafeError } from '@rocket.chat/core-services';
 import type { IUser } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { serverFetch as fetch } from '@rocket.chat/server-fetch';
@@ -40,7 +40,7 @@ export const executeDownloadPublicImportFile = async (userId: IUser['_id'], file
 	const importer = Importers.get(importerKey);
 	const isUrl = fileUrl.startsWith('http');
 	if (!importer) {
-		throw new Meteor.Error(
+		throw new ClientSafeError(
 			'error-importer-not-defined',
 			`The importer (${importerKey}) has no import class defined.`,
 			'downloadImportFile',
@@ -48,7 +48,7 @@ export const executeDownloadPublicImportFile = async (userId: IUser['_id'], file
 	}
 	// Check if it's a valid url or path before creating a new import record
 	if (!isUrl && !fs.existsSync(fileUrl)) {
-		throw new Meteor.Error('error-import-file-missing', fileUrl, 'downloadPublicImportFile');
+		throw new ClientSafeError('error-import-file-missing', fileUrl, 'downloadPublicImportFile');
 	}
 
 	const operation = await Import.newOperation(userId, importer.name, importer.key);
@@ -119,11 +119,11 @@ Meteor.methods<ServerMethods>({
 		const userId = Meteor.userId();
 
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', 'downloadPublicImportFile');
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', 'downloadPublicImportFile');
 		}
 
 		if (!(await hasPermissionAsync(userId, 'run-import'))) {
-			throw new Meteor.Error('error-action-not-allowed', 'Importing is not allowed', 'downloadPublicImportFile');
+			throw new ClientSafeError('error-action-not-allowed', 'Importing is not allowed', 'downloadPublicImportFile');
 		}
 
 		await executeDownloadPublicImportFile(userId, fileUrl, importerKey);

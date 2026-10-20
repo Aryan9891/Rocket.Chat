@@ -3,15 +3,6 @@ import { describe, it, beforeEach } from 'mocha';
 import proxyquire from 'proxyquire';
 import sinon from 'sinon';
 
-class MeteorErrorMock extends Error {
-	constructor(
-		public error: unknown,
-		public reason?: string,
-	) {
-		super(typeof reason === 'string' ? reason : String(error));
-	}
-}
-
 const retrieveCredential = sinon.stub().resolves(undefined);
 const insertOrUpdateSAMLUser = sinon.stub().resolves({ userId: 'user-id', token: 'login-token' });
 const getUserForCheck = sinon.stub().resolves({ _id: 'user-id', services: {} });
@@ -36,9 +27,6 @@ proxyquire.noCallThru().load('../../../../../server/lib/saml/loginHandler', {
 				handler.callsFake(fn);
 			},
 		},
-	},
-	'meteor/meteor': {
-		Meteor: { Error: MeteorErrorMock },
 	},
 	'./lib/SAML': {
 		SAML: { retrieveCredential, insertOrUpdateSAMLUser },

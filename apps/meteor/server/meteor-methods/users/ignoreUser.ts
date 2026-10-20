@@ -1,3 +1,4 @@
+import { ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Subscriptions } from '@rocket.chat/models';
 import { check } from 'meteor/check';
@@ -23,13 +24,13 @@ export const ignoreUser = async (
 	]);
 
 	if (!subscription) {
-		throw new Meteor.Error('error-invalid-subscription', 'Invalid subscription', {
+		throw new ClientSafeError('error-invalid-subscription', 'Invalid subscription', {
 			method: 'ignoreUser',
 		});
 	}
 
 	if (!subscriptionIgnoredUser) {
-		throw new Meteor.Error('error-invalid-subscription', 'Invalid subscription', {
+		throw new ClientSafeError('error-invalid-subscription', 'Invalid subscription', {
 			method: 'ignoreUser',
 		});
 	}
@@ -52,7 +53,7 @@ Meteor.methods<ServerMethods>({
 
 		const userId = Meteor.userId();
 		if (!userId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', {
 				method: 'ignoreUser',
 			});
 		}

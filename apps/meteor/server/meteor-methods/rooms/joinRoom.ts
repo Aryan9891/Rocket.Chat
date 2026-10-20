@@ -1,4 +1,4 @@
-import { Room } from '@rocket.chat/core-services';
+import { Room, ClientSafeError } from '@rocket.chat/core-services';
 import type { IRoom } from '@rocket.chat/core-typings';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { Rooms } from '@rocket.chat/models';
@@ -21,12 +21,12 @@ Meteor.methods<ServerMethods>({
 
 		const user = await Meteor.userAsync();
 		if (!user) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'joinRoom' });
+			throw new ClientSafeError('error-invalid-user', 'Invalid user', { method: 'joinRoom' });
 		}
 
 		const room = await Rooms.findOneById(rid);
 		if (!room) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'joinRoom' });
+			throw new ClientSafeError('error-invalid-room', 'Invalid room', { method: 'joinRoom' });
 		}
 
 		return Room.join({ room, user, ...(code ? { joinCode: code } : {}) });

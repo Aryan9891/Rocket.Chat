@@ -1,4 +1,4 @@
-import { api } from '@rocket.chat/core-services';
+import { api, ClientSafeError } from '@rocket.chat/core-services';
 import type { ServerMethods } from '@rocket.chat/ddp-client';
 import { CustomUserStatus } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
@@ -15,12 +15,12 @@ declare module '@rocket.chat/ddp-client' {
 
 export const deleteCustomUserStatus = async (userId: string, userStatusID: string): Promise<boolean> => {
 	if (!(await hasPermissionAsync(userId, 'manage-user-status'))) {
-		throw new Meteor.Error('not_authorized');
+		throw new ClientSafeError('not_authorized');
 	}
 
 	const userStatus = await CustomUserStatus.findOneAndDeleteById(userStatusID);
 	if (userStatus == null) {
-		throw new Meteor.Error('Custom_User_Status_Error_Invalid_User_Status', 'Invalid user status', { method: 'deleteCustomUserStatus' });
+		throw new ClientSafeError('Custom_User_Status_Error_Invalid_User_Status', 'Invalid user status', { method: 'deleteCustomUserStatus' });
 	}
 
 	void api.broadcast('user.deleteCustomStatus', userStatus);
@@ -32,7 +32,7 @@ Meteor.methods<ServerMethods>({
 	async deleteCustomUserStatus(userStatusID) {
 		methodDeprecationLogger.method('deleteCustomUserStatus', '9.0.0', '/v1/custom-user-status.delete');
 		if (!this.userId) {
-			throw new Meteor.Error('not_authorized');
+			throw new ClientSafeError('not_authorized');
 		}
 
 		return deleteCustomUserStatus(this.userId, userStatusID);
