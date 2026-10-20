@@ -61,7 +61,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
             role="group"
           >
             <button
-              class="rcx-box rcx-box--full rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
               type="button"
             >
               <span
@@ -69,7 +69,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>
@@ -233,7 +233,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
             role="group"
           >
             <button
-              class="rcx-box rcx-box--full rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
               type="button"
             >
               <span
@@ -241,7 +241,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>
@@ -249,7 +249,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               </span>
             </button>
             <button
-              class="rcx-box rcx-box--full rcx-button--success rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--success rcx-button"
               type="button"
             >
               <span
@@ -257,7 +257,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-phone rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-phone rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>
@@ -331,7 +331,7 @@ exports[`renders PermissionFlowModalNoDevices without crashing 1`] = `
             role="group"
           >
             <button
-              class="rcx-box rcx-box--full rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
               type="button"
             >
               <span
@@ -339,7 +339,7 @@ exports[`renders PermissionFlowModalNoDevices without crashing 1`] = `
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>
@@ -415,7 +415,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
             role="group"
           >
             <button
-              class="rcx-box rcx-box--full rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
               type="button"
             >
               <span
@@ -423,7 +423,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-mic-off rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>
@@ -431,7 +431,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               </span>
             </button>
             <button
-              class="rcx-box rcx-box--full rcx-button--success rcx-button"
+              class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--success rcx-button"
               type="button"
             >
               <span
@@ -439,7 +439,7 @@ Allow speaker and microphone access in your browser settings to prevent seeing t
               >
                 <i
                   aria-hidden="true"
-                  class="rcx-box rcx-box--full rcx-icon--name-phone rcx-icon rcx-css-1hdf9ok"
+                  class="rcx-box rcx-box--full rcx-icon--name-phone rcx-icon rcx-css-1c32rho"
                 >
                   
                 </i>

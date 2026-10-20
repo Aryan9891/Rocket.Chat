@@ -1878,7 +1878,7 @@ incident
                         role="group"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
                           type="button"
                         >
                           <span
@@ -1886,7 +1886,7 @@ incident
                           >
                             <i
                               aria-hidden="true"
-                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1hdf9ok"
+                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1c32rho"
                             >
                               
                             </i>
@@ -1894,7 +1894,7 @@ incident
                           </span>
                         </button>
                         <button
-                          class="rcx-box rcx-box--full rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
                           type="button"
                         >
                           <span
@@ -1902,7 +1902,7 @@ incident
                           >
                             <i
                               aria-hidden="true"
-                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1hdf9ok"
+                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1c32rho"
                             >
                               
                             </i>
@@ -3910,7 +3910,7 @@ incident
                         role="group"
                       >
                         <button
-                          class="rcx-box rcx-box--full rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
                           type="button"
                         >
                           <span
@@ -3918,7 +3918,7 @@ incident
                           >
                             <i
                               aria-hidden="true"
-                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1hdf9ok"
+                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1c32rho"
                             >
                               
                             </i>
@@ -3926,7 +3926,7 @@ incident
                           </span>
                         </button>
                         <button
-                          class="rcx-box rcx-box--full rcx-button"
+                          class="rcx-box rcx-box--full rcx-button--with-icon rcx-button"
                           type="button"
                         >
                           <span
@@ -3934,7 +3934,7 @@ incident
                           >
                             <i
                               aria-hidden="true"
-                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1hdf9ok"
+                              class="rcx-box rcx-box--full rcx-icon--name-download rcx-icon rcx-css-1c32rho"
                             >
                               
                             </i>

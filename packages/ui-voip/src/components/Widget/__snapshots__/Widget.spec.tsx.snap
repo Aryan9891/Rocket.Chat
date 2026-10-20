@@ -74,7 +74,7 @@ exports[`renders FullWidget without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button"
             name="phone-off"
             type="button"
           >
@@ -91,7 +91,7 @@ exports[`renders FullWidget without crashing 1`] = `
             </span>
           </button>
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--success rcx-button"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--success rcx-button"
             name="phone"
             type="button"
           >

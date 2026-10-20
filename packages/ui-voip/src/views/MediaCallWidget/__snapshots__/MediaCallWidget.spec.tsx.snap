@@ -122,7 +122,7 @@ exports[`renders IncomingCall without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -139,7 +139,7 @@ exports[`renders IncomingCall without crashing 1`] = `
             </span>
           </button>
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -288,7 +288,7 @@ exports[`renders IncomingCallConnecting without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -447,7 +447,7 @@ exports[`renders IncomingCallTransfer without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -464,7 +464,7 @@ exports[`renders IncomingCallTransfer without crashing 1`] = `
             </span>
           </button>
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -623,7 +623,7 @@ exports[`renders IncomingCallTransferConnecting without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -856,7 +856,7 @@ exports[`renders NewCall without crashing 1`] = `
             </i>
           </button>
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--success rcx-button rcx-css-t3n91h"
             type="button"
           >
             <span
@@ -2053,7 +2053,7 @@ exports[`renders OutgoingCall without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -2202,7 +2202,7 @@ exports[`renders OutgoingCallConnecting without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -2361,7 +2361,7 @@ exports[`renders OutgoingCallTransfer without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
@@ -2520,7 +2520,7 @@ exports[`renders OutgoingCallTransferConnecting without crashing 1`] = `
           role="group"
         >
           <button
-            class="rcx-box rcx-box--full rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
+            class="rcx-box rcx-box--full rcx-button--with-icon rcx-button--medium rcx-button--danger rcx-button rcx-css-t3n91h"
             name="phone"
             type="button"
           >
