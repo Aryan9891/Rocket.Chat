@@ -127,20 +127,16 @@ export const compareBSONValues = (a: unknown, b: unknown): number => {
 			);
 
 		case BSONType.Array: {
-			for (let i = 0; ; i++) {
-				if (i === (a as unknown[]).length) {
-					return i === (b as unknown[]).length ? 0 : -1;
-				}
-
-				if (i === (b as unknown[]).length) {
-					return 1;
-				}
-
-				const s = compareBSONValues((a as unknown[])[i], (b as unknown[])[i]);
+			const arrayA = a as unknown[];
+			const arrayB = b as unknown[];
+			for (let i = 0; i < arrayA.length && i < arrayB.length; i++) {
+				const s = compareBSONValues(arrayA[i], arrayB[i]);
 				if (s !== 0) {
 					return s;
 				}
 			}
+
+			return Math.sign(arrayA.length - arrayB.length);
 		}
 
 		case BSONType.BinData: {
