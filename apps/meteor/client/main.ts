@@ -1,4 +1,3 @@
-import './meteor/overrides';
 import './meteor/startup';
 import './lib/sdk/ddpSdk';
 import './serviceWorker';

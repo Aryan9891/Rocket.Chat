@@ -1,77 +1,163 @@
-// Single point of access to Meteor accounts-base's login lifecycle on the
-// client. Call sites outside client/meteor go through these helpers so the
-// eventual SDK-native auth replaces one module instead of every caller.
-import { Accounts } from 'meteor/accounts-base';
-import { Meteor } from 'meteor/meteor';
+// The login lifecycle on top of DDPSDK, with no accounts-base underneath.
+import { create } from 'zustand';
 
-export const callLoginMethod = (options: Omit<Accounts.LoginMethodOptions, 'userCallback'>) =>
-	new Promise<void>((resolve, reject) => {
-		Accounts.callLoginMethod({
-			...options,
-			userCallback: (error) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve();
-				}
-			},
-		});
-	});
+import { callMethod } from './connection';
+import { adoptAccountFromMeteorLoginResult, getDdpSdk } from '../lib/sdk/ddpSdk';
+import { STORAGE_KEYS, getStoredItem, removeStoredItem, setStoredItem } from '../lib/sdk/storage';
+import { userIdStore } from '../lib/user';
 
-export const loginWithToken = (token: string) =>
-	new Promise<void>((resolve, reject) => {
-		Meteor.loginWithToken(token, (error) => {
-			if (error) {
-				reject(error);
-				return;
-			}
-			resolve();
-		});
-	});
+type LoginResult = { id: string; token: string; tokenExpires?: Date | { $date: number } };
 
 type LoginWithFn = (...args: any[]) => void;
 
+const loggingIn = create<boolean>(() => false);
+
+const waitForConnection = async (): Promise<void> => {
+	const { connection } = getDdpSdk();
+	if (connection.status === 'connected') return;
+
+	await new Promise<void>((resolve, reject) => {
+		const stop = connection.on('connected', () => {
+			stop();
+			resolve();
+		});
+
+		// A socket that already gave up would never emit `connected` again on its own; fail the login instead of hanging.
+		if (connection.status !== 'connecting' && connection.status !== 'reconnecting') {
+			connection.connect().catch((error) => {
+				stop();
+				reject(error);
+			});
+		}
+	});
+};
+
+const makeClientLoggedIn = (result: LoginResult): void => {
+	const tokenExpires = result.tokenExpires instanceof Date ? result.tokenExpires : new Date(result.tokenExpires?.$date ?? Date.now());
+
+	setStoredItem(STORAGE_KEYS.USER_ID, result.id);
+	setStoredItem(STORAGE_KEYS.LOGIN_TOKEN, result.token);
+	setStoredItem(STORAGE_KEYS.LOGIN_TOKEN_EXPIRES, tokenExpires.toString());
+
+	adoptAccountFromMeteorLoginResult(result);
+	userIdStore.setState(result.id);
+};
+
+const makeClientLoggedOut = (): void => {
+	removeStoredItem(STORAGE_KEYS.USER_ID);
+	removeStoredItem(STORAGE_KEYS.LOGIN_TOKEN);
+	removeStoredItem(STORAGE_KEYS.LOGIN_TOKEN_EXPIRES);
+
+	const sdk = getDdpSdk();
+	sdk.account.clearCredentials();
+	userIdStore.setState(undefined);
+
+	// Clearing the user tears the authenticated socket down; the logged-out UI still needs one.
+	if (sdk.connection.status !== 'connected' && sdk.connection.status !== 'connecting') {
+		void sdk.connection.connect().catch((error) => console.warn('[accounts] reconnect after logout failed', error));
+	}
+};
+
+export const callLoginMethod = async ({
+	methodName = 'login',
+	methodArguments = [{}],
+}: {
+	methodName?: string;
+	methodArguments?: unknown[];
+}): Promise<void> => {
+	loggingIn.setState(true);
+	try {
+		const [credentials] = methodArguments as [{ resume?: string } | undefined];
+		// ddp-streamer only accepts resume logins on the socket, so credentials go through the REST method bridge and
+		// the token it returns authenticates the socket.
+		const resumeToken = credentials?.resume ?? ((await callMethod(methodName, ...methodArguments)) as LoginResult | undefined)?.token;
+		if (!resumeToken) {
+			throw new Error(`No result from call to ${methodName}`);
+		}
+
+		await waitForConnection();
+		const result = (await getDdpSdk().client.callAsyncWithOptions('login', { wait: true }, { resume: resumeToken })) as LoginResult;
+		if (!result?.id || !result.token) {
+			throw new Error(`No result from call to ${methodName}`);
+		}
+		makeClientLoggedIn(result);
+	} finally {
+		loggingIn.setState(false);
+	}
+};
+
+export const loginWithToken = (token: string) => callLoginMethod({ methodArguments: [{ resume: token }] });
+
+const loginWithMethods = new Map<string, LoginWithFn>();
+
 export const registerLoginWithMethod = (name: `loginWith${string}`, method: LoginWithFn): void => {
-	(Meteor as unknown as Record<string, unknown>)[name] = method;
+	loginWithMethods.set(name, method);
 };
 
-/** Resolves a `Meteor.loginWith<Service>` method registered by client/meteor/login */
-export const getLoginWithMethod = (name: string): LoginWithFn | undefined => {
-	const method = (Meteor as unknown as Record<string, unknown>)[name];
-	return typeof method === 'function' ? (method.bind(Meteor) as LoginWithFn) : undefined;
+export const getLoginWithMethod = (name: string): LoginWithFn | undefined => loginWithMethods.get(name);
+
+export const logout = async (): Promise<void> => {
+	try {
+		await getDdpSdk().client.callAsyncWithOptions('logout', { wait: true });
+	} finally {
+		makeClientLoggedOut();
+	}
 };
 
-export const logout = () => Meteor.logout();
-
-export const setConnectionUserId = (userId: string | null) => Meteor.connection.setUserId(userId);
-
-export const onEmailVerificationLink = (fn: (token: string) => void) => Accounts.onEmailVerificationLink(fn);
-
-export const onPageLoadLogin = (fn: (loginAttempt: unknown) => void) => Accounts.onPageLoadLogin(fn);
-
-// Accounts.loggingIn() is Tracker-reactive; hooking `_setLoggingIn` (also
-// touched by overrides/killMeteorStream.ts) fans transitions out to plain
-// listeners without entering a Tracker computation.
-const loggingInListeners = new Set<() => void>();
-let loggingInBridgeInstalled = false;
-const installLoggingInBridge = (): void => {
-	if (loggingInBridgeInstalled) return;
-	loggingInBridgeInstalled = true;
-	const wrap = Accounts as unknown as { _setLoggingIn?: (v: boolean) => void };
-	const original = wrap._setLoggingIn;
-	if (typeof original !== 'function') return;
-	wrap._setLoggingIn = function (this: typeof Accounts, v: boolean) {
-		original.call(this, v);
-		loggingInListeners.forEach((cb) => cb());
-	};
+export const setConnectionUserId = (userId: string | null): void => {
+	if (!userId) {
+		getDdpSdk().account.clearCredentials();
+	}
+	userIdStore.setState(userId ?? undefined);
 };
 
-export const subscribeLoggingIn = (cb: () => void): (() => void) => {
-	installLoggingInBridge();
-	loggingInListeners.add(cb);
-	return () => {
-		loggingInListeners.delete(cb);
-	};
+export const subscribeLoggingIn = (cb: () => void): (() => void) => loggingIn.subscribe(cb);
+
+export const isLoggingIn = (): boolean => loggingIn.getState();
+
+// Email verification links arrive as `#/verify-email/<token>`, the format accounts-base parsed on page load.
+const verifyEmailToken = window.location.hash.match(/^#\/verify-email\/(.*)$/)?.[1];
+if (verifyEmailToken) {
+	window.location.hash = '';
+}
+
+export const onEmailVerificationLink = (fn: (token: string) => void): void => {
+	if (verifyEmailToken) {
+		queueMicrotask(() => fn(verifyEmailToken));
+	}
 };
 
-export const isLoggingIn = (): boolean => Accounts.loggingIn();
+type PageLoadLoginAttempt = { type: 'resume'; allowed: boolean; error?: unknown; methodName: 'login'; methodArguments: unknown[] };
+
+let pageLoadLoginAttempt: PageLoadLoginAttempt | undefined;
+const pageLoadLoginCallbacks = new Set<(attempt: PageLoadLoginAttempt) => void>();
+
+export const onPageLoadLogin = (fn: (loginAttempt: PageLoadLoginAttempt) => void): void => {
+	if (pageLoadLoginAttempt) {
+		fn(pageLoadLoginAttempt);
+		return;
+	}
+	pageLoadLoginCallbacks.add(fn);
+};
+
+const settlePageLoadLogin = (attempt: PageLoadLoginAttempt): void => {
+	pageLoadLoginAttempt = attempt;
+	pageLoadLoginCallbacks.forEach((callback) => callback(attempt));
+	pageLoadLoginCallbacks.clear();
+};
+
+// Resumes the stored session once every module has loaded, as accounts-base did at package load.
+queueMicrotask(() => {
+	const token = getStoredItem(STORAGE_KEYS.LOGIN_TOKEN);
+	if (!token) return;
+
+	const methodArguments = [{ resume: token }];
+	loginWithToken(token).then(
+		() => settlePageLoadLogin({ type: 'resume', allowed: true, methodName: 'login', methodArguments }),
+		(error) => {
+			console.warn('[accounts] resume login failed', error);
+			makeClientLoggedOut();
+			settlePageLoadLogin({ type: 'resume', allowed: false, error, methodName: 'login', methodArguments });
+		},
+	);
+});
